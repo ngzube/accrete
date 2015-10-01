@@ -1,0 +1,15 @@
+ &inp nprov=6,ff=1.,tstop=1.5e8,iray=1,ilog=1,idsc=100,ixmix=1,xmix=100.,xratc=0.7,ifol=38,dw=0.034,tscale=1.,kmax=20000,kstep=100,dt=2.5e5,ypmx=20., &end
+fig 20 of GCA review MS (accrete5b)
+
+testing imix=1 (magma ocean) and variable y
+Sean Raymond version 0=567,888,551 ; 1a=4,16,22 2a=10,17,30,_38_
+1b=11,27,30  2b=8,_34_
+note that my index is +1 greater than his index!
+DW of 0.034 gives fHf/W=12 for mass-weighted average y=0.708
+2a 38 final collision is with 35
+2b 34 final collision is with 47
+final collision is big by setting for 2a xmix=0.8 and xratc=0.2
+for run 2b xmix=0.9 and xratc=0.7
+ixmix=-1 does core merging throughout
+ixmix=4 does core merging except for largest impacts
+

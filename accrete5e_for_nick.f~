@@ -1271,7 +1271,7 @@ C          HF/W IN CORE OF SMALL OBJECT
           END DO
           do i=1,4
             t1=(b1(i)*((y1*xm1)+(y2*xm2)))+(b1(i+4)*ym1*xm1)+
-      C                  (b(i+4)*ym2*xm2)
+     C                  (b(i+4)*ym2*xm2)
 c            write(6,*) 'check2 ',t1/ck(i)
           end do
 C
