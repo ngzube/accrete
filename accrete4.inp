@@ -1,3 +1,0 @@
- &inp
-nprov=6,ff=1.,tstop=1.5e8,iray=1,ilog=1,idsc=100,ixmix=1,xmix=100.,xratc=0.7,ifol=38,dw=0.034,tscale=1.,kmax=20000,kstep=100,dt=2.5e5,ypmx=20.,
-&end
