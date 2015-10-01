@@ -10,7 +10,7 @@ followgmt = dlmread('followgmt.dat');
 
 % Plot eps data: tracking of one object
 plot(eps(:,2)/10e6, eps(:,3))
-title('Hf-W chronology of asteroids and terrestrial planets');
+title('Hf-W chronology of particle 38');
 axis([0, 1.2*max(eps(:,2))/10e6, 0, 1.2*max(eps(:,3))]);
 xlabel('Time (Myr)');
 ylabel('\Delta\epsilon_W');
