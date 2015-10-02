@@ -30,6 +30,8 @@ default_fig20 = {'6','0.','1.5e8','1','1','100','1', ...
 options.Interpreter = 'tex';
 answer = inputdlg(prompt,dlg_title,num_lines,default_fig20,options);
 
+
+% Create string of the responses to be written to .inp file
 inp = char(answer);
 outp = [''];
 singlerow = [''];

@@ -1,11 +1,8 @@
 # Local files #
 ###############
-accrete4.inp
-accrete4(original).inp
+*.inp
+*.template
+*.dat
+*.jpg
 accrete5e_for_nick
-end.dat
-eps.dat
-follow.dat
-followgmt.dat
-output.dat
 

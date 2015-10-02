@@ -2,7 +2,6 @@
 -planetary accretion code with Hf/W tracking by Francis Nimmo, UCSC
 -non-master branch edits by Nick Zube.
 
-
 PROJECT FLOW:
 
 ==============
@@ -17,7 +16,7 @@ makeinput.m : allows user to input variable values for use in main program.
 ==============
 [Main Program]
 ==============
-accrete5e_for_nick.f
+accrete5e_for_nick.f (Fortran77)
 
 -Inputs collision data to track features of particles involved.
 -Allows control of Y (silicate fraction), DW (partition coefficients),
@@ -37,25 +36,25 @@ Unit 40 = follow.dat
 Unit 42 = eps.dat
 Unit 43 = followgmt.dat
 
-
 ==============
 [Output files] ===>
 ==============
 
 end.dat: Results for surviving particles. Almost the same as printed output.
- Mass, epsilon, semi-major axis, y (silicate fraction), Hf/W, ECC (unknown)
+-Mass, epsilon, semi-major axis, y (silicate fraction), Hf/W, ECC (unknown, read from output.dat)
 
 eps.dat: list of time evolution of epsilon_W value for the chosen particle.
 
 follow.dat: times and characteristics of collisions by our followed particle.
- TCOL(J), ICT1,XM(ICT1),ICT2,XM(ICT2),XM(ICT1)+XM(ICT2)
+-TCOL(J), ICT1,XM(ICT1),ICT2,XM(ICT2),XM(ICT1)+XM(ICT2)
+-time of collision, ID of target, mass of target, ID of impactor, mass of impactor, total mass
 
 followgmt.dat: more values for the same collisions in follow.dat
- TCOL(J),GAMT,EPSTT,0.3*(3.+LOG10(XMMT))
+-TCOL(J),GAMT,EPSTT,0.3*(3.+LOG10(XMMT))
+-time of collision, mass ratio impactor:target, tungsten anom of smaller?, calculation with smaller mass 
 
-=========
-[Results]
-=========
+================
+[Analysis files]
+================
 
-accplot.m: plot the dEps_W (tungsten isotope anomaly) for tracked particle
- -FUTURE: plot abilities for mass evolution
+accplot.m: plot the dEps_W (tungsten isotope anomaly) and mass vs. time for chosen particle
