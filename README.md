@@ -26,11 +26,11 @@ accrete5e_for_nick.f (Fortran77)
 
 Opens the following files:
 
-READ
+Read:
 Unit 20 = accrete4.inp
 Unit 22 = output.dat
 
-WRITE
+Write:
 Unit 28 = end.dat
 Unit 40 = follow.dat
 Unit 42 = eps.dat
