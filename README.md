@@ -5,13 +5,21 @@
 PROJECT FLOW:
 
 ==============
+[Master run file]
+==============
+
+run: CSH script that executes mkinput.py, then accrete5e_for_nick.f, then stores input and output data files in a time-labeled folder. Run this file to activate the complete ACCRETE progam package.
+
+
+==============
 [Input files]   <===
 ==============
 
 output.dat: list of initial positions and collisions of 1054 objects. Read by main program.
 
-makeinput.m : allows user to input variable values for use in main program.
- Outputs a file called accrete4.inp to be read by main program.
+mkinput.py: Python script creates a window to allow user to set variable defaults for accrere4.inp
+
+makeinput.m : redundant version of mkinput.py, written in Matlab
 
 ==============
 [Main Program]
@@ -37,7 +45,7 @@ Unit 42 = eps.dat
 Unit 43 = followgmt.dat
 
 ==============
-[Output files] ===>
+[Output files] ===> stored in /data in a timestamped folder
 ==============
 
 end.dat: Results for surviving particles. Almost the same as printed output.
@@ -57,4 +65,8 @@ followgmt.dat: more values for the same collisions in follow.dat
 [Analysis files]
 ================
 
-accplot.m: plot the dEps_W (tungsten isotope anomaly) and mass vs. time for chosen particle
+accplot.m: plot the dEpsilon_W (tungsten isotope anomaly) and mass vs. time for chosen particle
+
+accplot_compare.m: allows plotting of multiple datasets at once
+
+
