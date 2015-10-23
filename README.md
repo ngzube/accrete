@@ -16,7 +16,7 @@ run: CSH script that executes mkinput.py, then accrete5e_for_nick.f, then stores
 ==============
 
 output.dat: list of initial conditions and collisions of objects. Read by main program.
-Particle # - provedence - semi-major - mass - y partition fraction - eccentricity - time till ejection
+Particle # - iprovenance - semi-major? - mass - y partition fraction - eccentricity - time till ejection
 (stored in arrays: NDUM,IPROV,AN,XM,YPART,ECC,TEJ)
 (#Note: YPART is usually set constant by our program)
 Time of collision - ID 1 - Mass 1- ID 2 - Mass 2 - semi-major axis - eccentricity

@@ -3,12 +3,25 @@
 
 # Running this file will currently run through all steps of analysis except 
 # plotting.
+# If any argument is used after ./run, you are able to change the default input file.
+# e.g.: ./run -c
 
+if($# > 0) then
+ python mkinput.py -c
+else 
+ python mkinput.py
+endif
+echo 'Input created'
 
 # Run script to create input file from GUI
-python mkinput.py
+python convert.py
+echo 'Jacobson files converted to normal output'
 
 # Run main program
+
+gfortran accrete5e_for_nick.f
+mv a.out accrete5e_for_nick
+echo 'Program compiled'
 ./accrete5e_for_nick
 
 # Set string with timestamp
@@ -33,6 +46,7 @@ mkdir data/$ful
 # Move all produced .dat files to the new folder, and then the .inp file
 find *.dat -not -name output.dat -print0 | xargs -0 mv -t data/$ful
 mv accrete4.inp data/$ful
+echo 'Final data files stored in' data/$ful
 
 # Run script to create graphical output
 #python accplot.py

@@ -7,6 +7,7 @@
 
 # Tkinter is a GUI package in Python
 from Tkinter import *
+import argparse
 
 prompts = ['nprov: UNKNOWN. for loop max. 1 indicates chondritic?',
     'ff, Equilibration fraction (0 = complete, 1 = none)',
@@ -28,13 +29,18 @@ variables = ['nprov','ff','tstop','iray','ilog','idsc','ixmix',
     'xmix','xratc','ifol','dw','tscale','kmax','kstep','dt',
     'ypmx']
 num_inputs = 16
-defaults = ['6','0.','1.5e8','1','1','1','1',
-    '100.','0.7','38','0.034','1.','20000','100','2.5e5',
+defaults = ['6','0.','2.5e8','1','1','1','1',
+    '100.','0.7','11','0.034','1.','200000','100','2.5e5',
     '20.']
+
+# Original values: 
+#defaults = ['6','0.','1.5e8','1','1','1','1',
+#    '100.','0.7','38','0.034','1.','20000','100','2.5e5',
+#    '20.']
 
 # Typical changes to default values:
 # FF default may be 0 or 1
-# IDSC default may be 1 or 100
+# IDSC default may be 1 or 100 (full plumbing or not)
 # IFOL may be any particle ID#
 
 
@@ -43,26 +49,44 @@ def publish():
     outfile = open('accrete4.inp',"w")
     outfile.write(' &inp\n')
     for i in range(len(variables)):
-        outfile.write(variables[i] + '=' + v[i].get() + ',')
+        outfile.write(variables[i] + '=' + v[i] + ',')
     outfile.write('\n&end\n')
     outfile.close()
     root.destroy()
 
+
+#=================================================
+#MAIN SCRIPT
 # Open input window and assign title
+
 root = Tk()
-root.title("Create 'accrete4.inp' file")
-# Lists for containing Entry and StringVar objects
-e = []
-v = []           
-for i in range(len(prompts)):
-    va = StringVar()
-    en = Entry(root, textvariable=va)
-    en.grid(row=i,column=0)
-    en.insert(0,defaults[i])
-    v.append(va)
-    e.append(en)
-    Label(text=prompts[i]).grid(row=i,column=1,sticky=W)
-Button(root,text='OK',command=publish).grid(column=1,row=i+1,sticky=W)
-# mainloop runs the frame on a loop until it is closed (upon button press)
-root.mainloop()
+parser = argparse.ArgumentParser(description='Help file for mkinput.py')
+parser.add_argument('-c','--change',help='Open GUI to change input file',
+                    action='store_true')
+args = parser.parse_args()
+
+if not args.change:
+ v = defaults
+ publish()
+ 
+else:
+ root.title("Create 'accrete4.inp' file")
+ # Lists for containing Entry and StringVar objects
+ e = []
+ v = []           
+ for i in range(len(prompts)):
+     va = StringVar()
+     en = Entry(root, textvariable=va)
+     en.grid(row=i,column=0)
+     en.insert(0,defaults[i])
+     v.append(va.get())
+     e.append(en)
+     Label(text=prompts[i]).grid(row=i,column=1,sticky=W)
+
+ root.bind("<Return>", lambda event: publish())
+ ok = Button(root,text='OK',command=publish)
+ ok.grid(column=1,row=i+1,sticky=W)
+ ok.focus_force()
+ # mainloop runs the frame on a loop until it is closed (upon button press)
+ root.mainloop()
 

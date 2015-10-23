@@ -26,14 +26,14 @@ C
         REAL EPS(5000),YP(5000),XP2(5000),YP2(5000)
         REAL EPSTH(5000),YP4(5000),YP5(5000),ECC(5000)
         REAL YP6(5000),TEJ(5000),STRAC(5000),YP7(5000)
-        REAL EPSP(25000),XMP(25000),TIMP(1500),XMPP(1500)
+        REAL EPSP(25000),XMP(25000),TIMP(2500),XMPP(2500)
         REAL ABIN(50),XBIN(50),CON(50),TPL(50),FAX(50)
 
 
         REAL XM(5000),TCOL(5000),DTCOL(5000),AXES(5000)
         REAL Y(10),YPART(5000)
-        REAL AN(5000),DWW(10),TFCOL(1500)
-        INTEGER IC1(5000),IC2(5000),IPART(1500),NPAR(5000)
+        REAL AN(5000),DWW(10),TFCOL(2500)
+        INTEGER IC1(5000),IC2(5000),IPART(2500),NPAR(5000)
         INTEGER ICOL(5000),IPROV(5000),NCOL(5000),NFIN(5000)
         COMMON/PARAM/DHF,DW,XLHF
         COMMON/WSPACE/W1(400000)
@@ -168,7 +168,7 @@ C       READ IN COLLISION DATA FILE. NOTE THAT O'BRIEN DOES
 C       NOT NUMBER HIS PARTICLES SEQUENTIALLY (IE THERE ARE GAPS).
 C       COLLISION FILE ALSO INCLUDES INITIAL POSITIONS OF PARTICLES.
 
-        OPEN(UNIT=22,FILE='output.dat')
+        OPEN(UNIT=22,FILE='output4-1.dat')
         J=1
         IF(IRAY.NE.2)READ(22,*) IMAX
         IF(IRAY.EQ.2)IMAX=5000
@@ -195,7 +195,7 @@ C       FE FRACTION OF INDIVIDUAL PARTICLES
             IF(IRAY.NE.1)READ(22,*) NDUM,IPROV(N),AN(N),XMASS
             IF(IRAY.EQ.1)READ(22,*) NDUM,IPROV(N),AN(N),
      C                           XMASS,YTP,ECC(N),TEJ(N)
-c            READ(22,*) NDUM,IPROV(N)
+C            READ(22,*) NDUM,IPROV(N)
 CFN
 C           CORRECTING MASS-READING ERROR
 CFN
@@ -238,9 +238,17 @@ C         CORRECTING MASS-READING ERROR
 
           IC1(J)=ICT1
           IC2(J)=ICT2
-          TCOL(J)=TCOL(J)*TSCALE
-          I1=IC1(J)
-          I2=IC2(J)
+c
+c  ??       temporary fix to ensure that I1 is always most massive ??
+
+
+c          if(xmt1.lt.xmt2)then
+c            ic2(j)=ict1
+c            ic1(j)=ict2
+c          endif
+c          TCOL(J)=TCOL(J)*TSCALE
+c          I1=IC1(J)
+c          I2=IC2(J)
 C
 C         NEXT LINES AVOID ERROR OF OVERWRITING MASS FOR IRAY.NE.2
 
@@ -249,12 +257,13 @@ C         NEXT LINES AVOID ERROR OF OVERWRITING MASS FOR IRAY.NE.2
             IF(XM(I2).EQ.0.)XM(I2)=XMT2
             IF(I1.GT.IMAX)IMAX=I1
             IF(I2.GT.IMAX)IMAX=I2
-c            write(6,*) TCOL(J),ICT1,XMT1,ICT2,XMT2,i1,i2,iray
+C            write(6,*) TCOL(J),ICT1,XMT1,ICT2,XMT2,i1,i2,iray
           ENDIF
 C
 C         AVOIDING ZERO-MASS COLLISIONS
 
           WRITE(6,*) J,TCOL(J),I1,I2,XM(I1),XM(I2)
+
           IF(XMT2.GT.0.)J=J+1
         END DO
  100    CONTINUE
@@ -406,6 +415,7 @@ C          ICOL KEEPS TRACK OF WHICH PARTICLE EXPERIENCES A COLLISION
               ICT1=IC1(J)
               ICT2=IC2(J)
               write(6,*) 'collide ',tcol(j),ic1(j),ic2(j),ifol
+
 C
 C             DOES THE COLLISION AFFECT THE PARTICLE WE ARE FOLLOWING?
 
