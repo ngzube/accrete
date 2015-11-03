@@ -1,9 +1,9 @@
-############################################################
+##############################################################################
 # Python 2.7.0 script to create an input file for accrete5e.
 #
 # Nick Zube, completed v1.0 on 2015-10-09
 # Accepts input from a window and prints a txt file to be used by accrete5e
-############################################################
+##############################################################################
 
 # Tkinter is a GUI package in Python
 from Tkinter import *
@@ -29,8 +29,8 @@ variables = ['nprov','ff','tstop','iray','ilog','idsc','ixmix',
     'xmix','xratc','ifol','dw','tscale','kmax','kstep','dt',
     'ypmx']
 num_inputs = 16
-defaults = ['6','0.','2.5e8','1','1','1','1',
-    '100.','0.7','11','0.034','1.','200000','100','2.5e5',
+defaults = ['6','0.5','2.5e8','1','1','1','1',
+    '100.','0.7','7','0.034','1.','200000','100','2.5e5',
     '20.']
 
 # Original values: 
@@ -49,14 +49,15 @@ def publish():
     outfile = open('accrete4.inp',"w")
     outfile.write(' &inp\n')
     for i in range(len(variables)):
-        outfile.write(variables[i] + '=' + v[i] + ',')
+        if args.change: outfile.write(variables[i] + '=' + v[i].get() + ',')
+        else: outfile.write(variables[i] + '=' + v[i] + ',')
     outfile.write('\n&end\n')
     outfile.close()
     root.destroy()
 
 
 #=================================================
-#MAIN SCRIPT
+# MAIN SCRIPT
 # Open input window and assign title
 
 root = Tk()
@@ -66,10 +67,12 @@ parser.add_argument('-c','--change',help='Open GUI to change input file',
 args = parser.parse_args()
 
 if not args.change:
- v = defaults
- publish()
+    print 'input not asked for'
+    v = defaults
+    publish()
  
 else:
+ print 'input asked for'
  root.title("Create 'accrete4.inp' file")
  # Lists for containing Entry and StringVar objects
  e = []
@@ -79,11 +82,14 @@ else:
      en = Entry(root, textvariable=va)
      en.grid(row=i,column=0)
      en.insert(0,defaults[i])
-     v.append(va.get())
+     v.append(va)
      e.append(en)
      Label(text=prompts[i]).grid(row=i,column=1,sticky=W)
 
- root.bind("<Return>", lambda event: publish())
+# Tried to allow Return button to be used as button click, but this caused
+# errors in publish() function.
+#root.bind("<Return>", lambda event: publish())
+
  ok = Button(root,text='OK',command=publish)
  ok.grid(column=1,row=i+1,sticky=W)
  ok.focus_force()

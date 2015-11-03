@@ -168,7 +168,7 @@ C       READ IN COLLISION DATA FILE. NOTE THAT O'BRIEN DOES
 C       NOT NUMBER HIS PARTICLES SEQUENTIALLY (IE THERE ARE GAPS).
 C       COLLISION FILE ALSO INCLUDES INITIAL POSITIONS OF PARTICLES.
 
-        OPEN(UNIT=22,FILE='output4-1.dat')
+        OPEN(UNIT=22,FILE='output.dat')
         J=1
         IF(IRAY.NE.2)READ(22,*) IMAX
         IF(IRAY.EQ.2)IMAX=5000
@@ -448,6 +448,7 @@ C                YPART IS THE SILICATE MASS FRACTION
                  XMMT=XM(ICT1)
                  YPTT=YPART(ICT1)
                  EPSTT=EPS(ICT1)
+                 epsbig=eps(ICT1)
                  IF(XM(ICT2).LT.XMMT.AND.IRAY.NE.2)THEN
                     XMMT=XM(ICT2)
                     YPTT=YPART(ICT2)

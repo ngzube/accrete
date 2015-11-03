@@ -12,14 +12,23 @@
 ##############################################################################
 
 # Assign strings for ratio number (4 or 8) and run number to be converted:
-ratio = '4'
-run = '1'
+ratio = '8'
+run = '18'
+
+# Assign default values for those not included in Jacobson files
+iprov0 = '1'
+ypart0 = '0.3'
+ecc0 = '0'
+tej0 = '10E+11'
+
 
 #=============================================
 # Prints collected data to a text file.
 
 def publish():
-    outfile = open('output' + ratio + '-' + run + '.dat',"w")
+    outfile = open('output.dat',"w")
+    # Use commented line to give specific names to output files
+    #outfile = open('output' + ratio + '-' + run + '.dat',"w")
     outfile.write(str(num_objects) + '\n')
     for i in range(len(an)):
         #Original: NDUM,IPROV,AN,              XM,                          YPART,ECC,TEJ
@@ -45,13 +54,14 @@ def intake(ratio_string,run_string):
     with open(instring + 'aorig.dat','r') as infile:
         for line in infile:
             entries = line.split()
-            iprov.append('1')    # arbitrarily set
+            iprov.append(iprov0)
             an.append(entries[1])
-            xm.append('0')       # appended later
-            ypart.append('0.3')  # arbitrarily set
-            ecc.append('0')      # arbitrarily set
-            tej.append('10E+11') # arbitrarily set                       
+            xm.append('0')       # adjusted later when checking collisions
+            ypart.append(ypart0)
+            ecc.append(ecc0)
+            tej.append(tej0)                       
         num_objects = len(an)
+        print num_objects
     
     with open(instring + 'all.dat','r') as infile:
         prev_time = 0.0
@@ -61,6 +71,7 @@ def intake(ratio_string,run_string):
             # one second to the time if it matches the previous one
             current_time = float(entries[0])
             if current_time == prev_time:
+                print '******************SAME TIME*****************',current_time
                 current_time += 1.0
             tcol.append(str(current_time))
             prev_time = current_time
@@ -89,18 +100,22 @@ num_col = 0
 
 ## Uncomment code below to run over all Jacobson files
 
-ratio = '4'
-numstrs = ['1','2','3','4','5','6','7','8','9','10']
-for run in numstrs:
-    [num_col,num_objects] = intake(ratio,run)
-    publish()
-    print 'Finished', ratio, 'to1-0.8-Run', run
-ratio = '8'
-numstrs += ['11','12','13','14','15','17','18']
-for run in numstrs:
-    [num_col,num_objects] = intake(ratio,run)
-    publish()
-    print 'Finished', ratio, 'to1-0.8-Run', run
+[num_col,num_objects] = intake(ratio,run)
+publish()
+print 'Finished', ratio, 'to1-0.8-Run', run
+
+#ratio = '4'
+#numstrs = ['1','2','3','4','5','6','7','8','9','10']
+#for run in numstrs:
+#    [num_col,num_objects] = intake(ratio,run)
+#    publish()
+#    print 'Finished', ratio, 'to1-0.8-Run', run
+#ratio = '8'
+#numstrs += ['11','12','13','14','15','17','18']
+#for run in numstrs:
+#    [num_col,num_objects] = intake(ratio,run)
+#    publish()
+#    print 'Finished', ratio, 'to1-0.8-Run', run
 
 
 

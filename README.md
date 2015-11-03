@@ -56,12 +56,9 @@ Opens the following files:
 
 **followgmt.dat:** more values for the same collisions in follow.dat
 -TCOL(J),GAMT,EPSTT,0.3*(3.+LOG10(XMMT))
--time of collision, mass ratio impactor:target, tungsten anom of smaller?, calculation with smaller mass 
+-time of collision, mass ratio impactor:target, tungsten anom of smaller, calculation with smaller mass 
 
-=================
 ## Analysis files
-=================
-
 **accplot.m:** plot the dEpsilon_W (tungsten isotope anomaly) and mass vs. time for chosen particle
 
 **accplot_compare.m:** allows plotting of multiple datasets at once
@@ -81,4 +78,9 @@ Agnor, C;
 Yin, Qingzhu;
 Jacobsen, Stein;
 
+
+
+k=0.5
+W vs Semi-major, vs mass
+4-1 and 8-1 groups
 
