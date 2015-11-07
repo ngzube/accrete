@@ -26,10 +26,10 @@ tej0 = '10E+11'
 # Prints collected data to a text file.
 
 def publish():
-    outfile = open('output.dat',"w")
-    # Use commented line to give specific names to output files
-    #outfile = open('output' + ratio + '-' + run + '.dat',"w")
-    outfile.write(str(num_objects) + '\n')
+    #outfile = open('output.dat',"w")
+    # Use line below to give specific names to output files
+    outfile = open('output' + ratio + '-' + run + '.dat',"w")
+    outfile.write(str(n_objects) + '\n')
     for i in range(len(an)):
         #Original: NDUM,IPROV,AN,              XM,                          YPART,ECC,TEJ
         #Jacobson: NDUM, -,   Semi-major axis, mass from first collision,   -,    -,  -
@@ -50,6 +50,8 @@ def publish():
 # Read info from Jasboson files
 
 def intake(ratio_string,run_string):
+    num_objects = 0
+    num_col = 0
     instring = 'ForNimmo2/' + ratio + 'to1-0.8-Run' + run + '-'
     with open(instring + 'aorig.dat','r') as infile:
         for line in infile:
@@ -61,7 +63,7 @@ def intake(ratio_string,run_string):
             ecc.append(ecc0)
             tej.append(tej0)                       
         num_objects = len(an)
-        print num_objects
+        #print num_objects
     
     with open(instring + 'all.dat','r') as infile:
         prev_time = 0.0
@@ -92,31 +94,39 @@ def intake(ratio_string,run_string):
 #MAIN SCRIPT
 
 # Arrays for the variables we will want to print in the style of 'output.dat'
-# Assigns 6 separate empty lists [] to each named variable
-iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
-tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
-num_objects = 0
-num_col = 0
 
-## Uncomment code below to run over all Jacobson files
+## Code to run over all Jacobson files ##
+ratio = '4'
+numstrs = ['1','2','3','4','5','6','7','8','9','10']
+for run in numstrs:
+    # Assigns 6 separate empty lists [] to each named variable
+    iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
+    tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
+    n_objects = 0
+    n_col = 0
+    [n_col,n_objects] = intake(ratio,run)
+    if len(run) < 2: run = '0'+run
+    publish()
+    #print 'Finished', ratio, 'to1-0.8-Run', run
+ratio = '8'
+numstrs += ['11','12','13','14','15','17','18']
+for run in numstrs:
+    iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
+    tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
+    n_objects = 0
+    n_col = 0
+    [n_col,n_objects] = intake(ratio,run)
+    if len(run) < 2: run = '0'+run
+    publish()
+    #print 'Finished', ratio, 'to1-0.8-Run', run
 
-[num_col,num_objects] = intake(ratio,run)
-publish()
-print 'Finished', ratio, 'to1-0.8-Run', run
 
-#ratio = '4'
-#numstrs = ['1','2','3','4','5','6','7','8','9','10']
-#for run in numstrs:
-#    [num_col,num_objects] = intake(ratio,run)
-#    publish()
-#    print 'Finished', ratio, 'to1-0.8-Run', run
-#ratio = '8'
-#numstrs += ['11','12','13','14','15','17','18']
-#for run in numstrs:
-#    [num_col,num_objects] = intake(ratio,run)
-#    publish()
-#    print 'Finished', ratio, 'to1-0.8-Run', run
-
-
-
+## Code to run on a single file ##
+#iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
+#tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
+#n_objects = 0
+#n_col = 0
+#[num_col,num_objects] = intake(ratio,run)
+#publish()
+#print 'Finished', ratio, 'to1-0.8-Run', run
 

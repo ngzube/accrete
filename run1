@@ -1,0 +1,33 @@
+#!/bin/csh -f
+# Shell script to run accrete5e over one file and name output properly.
+
+# Set name of output to use and object to follow here
+set runfile = "output4-01.dat"
+set follow = 7
+
+############################################
+
+set dat = `date +"%Y-%m-%d_%T"`
+echo "Run began at $dat"
+set ful = "run_$dat-SOLO"
+mkdir data/$ful
+
+# Run convert.py to create input files
+#python convert.py
+#mv output* Jac_output/
+
+# Compile main program
+gfortran accrete5e_for_nick.f
+mv a.out accrete5e_for_nick
+echo 'Program compiled'
+
+python mkinput.py -fol $follow
+cp Jac_output/$runfile output.dat
+./accrete5e_for_nick
+echo "Program complete"
+set runtype = ($runfile:as/output//)
+set folder = "$runtype-following_$follow"
+mkdir data/$ful/$folder
+mv accrete4.inp data/$ful/$folder
+mv *.dat data/$ful/$folder
+echo "Stored data in data/$ful/$folder"

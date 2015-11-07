@@ -3,6 +3,18 @@
 #
 # Nick Zube, completed v1.0 on 2015-10-09
 # Accepts input from a window and prints a txt file to be used by accrete5e
+
+# Uses:
+#
+# $ python mkinput.py  
+#     -> creates accrete4.inp from default values below
+#
+# $ python mkinput.py -fol 3
+#     -> creates accrete4.inp from default values below, changing ifol to 3
+#
+# $ python mkinput.py  -c
+#     -> Allow user input with a GUI of all values, then creates accrete4e.inp
+#
 ##############################################################################
 
 # Tkinter is a GUI package in Python
@@ -60,19 +72,24 @@ def publish():
 # MAIN SCRIPT
 # Open input window and assign title
 
+v = defaults
 root = Tk()
 parser = argparse.ArgumentParser(description='Help file for mkinput.py')
+parser.add_argument('-fol', type=int, nargs=1, default='0')
 parser.add_argument('-c','--change',help='Open GUI to change input file',
                     action='store_true')
+
 args = parser.parse_args()
 
-if not args.change:
-    print 'input not asked for'
-    v = defaults
+if args.fol != 0:
+#    print 'Object to follow = ',args.fol[0]
+    v[9] = str(args.fol[0])
     publish()
- 
+elif not args.change:
+    print 'input not asked for'
+    publish()
 else:
- print 'input asked for'
+ print 'complete input asked for'
  root.title("Create 'accrete4.inp' file")
  # Lists for containing Entry and StringVar objects
  e = []

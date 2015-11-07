@@ -1,54 +1,88 @@
 #!/bin/csh -f
-# Shell script to run accrete5e and name output properly
+# Shell script to run accrete5e over all data and name output properly.
 
-# Running this file will currently run through all steps of analysis except 
-# plotting.
-# If any argument is used after ./run, you are able to change the default input file.
-# e.g.: ./run -c
+# Use string 'dat' to create a timestamped folder, identifying the run
+set dat = `date +"%Y-%m-%d_%T"`
+echo "Run began at $dat"
+set ful = "run_$dat"
+mkdir data/$ful
 
-if($# > 0) then
- python mkinput.py -c
-else 
- python mkinput.py
-endif
-echo 'Input created'
+# Get list of particles to follow for each data file
+set followlist = `awk '{print}' followlist.txt`
 
-# Run script to create input file from GUI
+# Run script to create input files
 python convert.py
 echo 'Jacobson files converted to normal output'
+mv output* Jac_output/
+echo 'Output files moved to Jac_output directory'
 
-# Run main program
-
+# Compile main program
 gfortran accrete5e_for_nick.f
 mv a.out accrete5e_for_nick
 echo 'Program compiled'
-./accrete5e_for_nick
 
-# Set string with timestamp
+# Run program over all data sets
+
+set i = 1
+set r = 1
+set ratio = 4
+# Loop over all converted .dat files
+foreach file (Jac_output/*.dat)
+    # Get set of objects to follow (stored in each row of followlist.txt)
+    set row = $followlist[$i]
+    # Set name format to number runs as 01, 02,... 10, 11,... etc.)
+    if ($r < 10) then
+        set rstring = "0$r"
+    else 
+        set rstring = "$r"
+    endif
+    # Iterate through all "follow #s" in each run
+    foreach num ($row:as/,/ /)
+        cp $file output.dat
+        python mkinput.py -fol $num
+        ./accrete5e_for_nick
+        echo "Program complete"
+        set folder = "$ratio-1-Run$rstring-following_$num"
+        mkdir data/$ful/$folder
+        mv accrete4.inp data/$ful/$folder
+        mv *.dat data/$ful/$folder
+        echo "Stored data in data/$ful/$folder"
+    end
+    @ i++
+    @ r++
+    if ($r > 10 && $ratio != 8) then
+        set ratio = 8
+        set r = 1
+    endif
+end
+
+
+echo 'Final data files stored in' data/$ful
+
+# Create graphical outputs
+
+
+
+
 
 ###DEPRICATED###
 # Originally I let this script pull variables from the input file to identify
 # the runs, but now I just include the input file for complete identification.
-
-# Set string with value for ifol, the followed particle's number
+#
+# Set string with value for ifol, the followed particle's number:
 #set num = `cut -d ',' -f10 -s accrete4.inp | cut -d '=' -f2`
 # Set string with value for FF
 #set ff = `cut -d ',' -f2 -s accrete4.inp | cut -d '=' -f2`
-################
-
-set dat = `date +"%Y-%m-%d_%T"`
-
-# Use string 'dat' to create a timestamped folder, identifying the run
 #set ful = "run_$dat,particle_$num,FF_$ff"
-set ful = "run_$dat"
-mkdir data/$ful
 
-# Move all produced .dat files to the new folder, and then the .inp file
-find *.dat -not -name output.dat -print0 | xargs -0 mv -t data/$ful
-mv accrete4.inp data/$ful
-echo 'Final data files stored in' data/$ful
+# Moving all .dat except output.dat:
+#find *.dat -not -name output.dat -print0 | xargs -0 mv -t data/$ful
 
-# Run script to create graphical output
-#python accplot.py
-
+# Letting command input of any kind activate the -c argument of mkinput.py:
+#if($# > 0) then
+# python mkinput.py -c
+#else 
+# python mkinput.py
+#endif
+################
 
