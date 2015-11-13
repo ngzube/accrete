@@ -5,24 +5,27 @@
 PROJECT FLOW:
 
 ## Master run file
-**run1:** CSH script that can run the following:
-- convert.py
-- mkinput.py
-- accrete5e_for_nick.f
-- script that stores input and output data files in a time-labeled folder
+**run:** CSH script that can run the following (all can also be run individually):
+- convert.py: using Jacobson output files, re-style them in O'Brien format to work with accrete5e.f
+- Move these new files to a directory, Jac_output/
+- accrete5e_for_nick.f: Compile the main Hf/W program by Francis Nimmo
+- Loop over all runs, checking which particles to follow with the file followlist.txt, then running mkinput.py to set environment variables for each run, then running accrete5e.exe on each
+- store input and output data files in a time-labeled directory within data/
+- datagrabber.py: to compile lists of mass, semi-major axis, and epsilon for all surviving particles in each runtype
+- accplot.py: create various plots of the acquired data
 
 ## Input files   <===
-**output.dat:** list of initial conditions and collisions of objects. Read by main program. O'Brien format.
+**output.dat:** list of initial conditions and collisions of objects. Read by main program. Requires Raymond or O'Brien format.
 
-- Particle # - iprovenance - semi-major? - mass - y partition fraction - eccentricity - time till ejection
+- Particle # - iprovenance - semi-major - mass - y partition fraction - eccentricity - time till ejection
 - stored in arrays: NDUM,IPROV,AN,XM,YPART,ECC,TEJ
 - *Note: YPART is usually set constant by our program*
 - Time of collision - ID 1 - Mass 1- ID 2 - Mass 2 - semi-major axis - eccentricity
 - TCOL-ICT1-XMT1-ICT2-XMT2-AN-ECC
 
-**mkinput.py:** Python script creates a window to allow user to set variable defaults for accrere4.inp
+**mkinput.py:** Python script can create a window to allow user to set variable defaults for accrere4.inp. Can also be run automatically without input, relying on default values set at top of code.
 
-**makeinput.m :** redundant version of mkinput.py, written in Matlab
+**datagrabber.py:** Python script to search for finished output files and compile lists of surviving particles, their mass, semi-major axis, dEpsilon, ID, and Run#.
 
 ## Main Program
 **accrete5e_for_nick.f** (Fortran77)
@@ -61,12 +64,11 @@ Opens the following files:
 -time of collision, mass ratio impactor:target, tungsten anom of smaller, calculation with smaller mass 
 
 ## Analysis files
-**accplot.m:** plot the dEpsilon_W (tungsten isotope anomaly) and mass vs. time for chosen particle
+**accplot.py: Python; plot variations of dEpsilon, mass, semi-major for groups of runs
 
-**accplot_compare.m:** allows plotting of multiple datasets at once
+**accplot.m:** Matlab; plot the dEpsilon_W (tungsten isotope anomaly) and mass vs. time for chosen particle
 
-
-
+**accplot_compare.m:** Matlab; allows plotting of multiple datasets at once
 
 Other contributors:
 > Nimmo, Francis;
@@ -79,10 +81,4 @@ Halliday, Alexander;
 Agnor, C;
 Yin, Qingzhu;
 Jacobsen, Stein;
-
-
-
-k=0.5
-W vs Semi-major, vs mass
-4-1 and 8-1 groups
 
