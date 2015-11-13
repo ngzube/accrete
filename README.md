@@ -64,7 +64,7 @@ Opens the following files:
 ## Analysis files
 **datagrabber.py:** Python script to search for finished output files and compile lists of surviving particles, their mass, semi-major axis, dEpsilon, ID, and Run#.
 
-**accplot.py: Python; plot variations of dEpsilon, mass, semi-major for groups of runs
+**accplot.py:** Python; plot variations of dEpsilon, mass, semi-major for groups of runs
 
 **accplot.m:** Matlab; plot the dEpsilon_W (tungsten isotope anomaly) and mass vs. time for chosen particle
 
