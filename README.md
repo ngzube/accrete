@@ -25,8 +25,6 @@ PROJECT FLOW:
 
 **mkinput.py:** Python script can create a window to allow user to set variable defaults for accrere4.inp. Can also be run automatically without input, relying on default values set at top of code.
 
-**datagrabber.py:** Python script to search for finished output files and compile lists of surviving particles, their mass, semi-major axis, dEpsilon, ID, and Run#.
-
 ## Main Program
 **accrete5e_for_nick.f** (Fortran77)
 - Inputs collision data to track features of particles involved.
@@ -64,6 +62,8 @@ Opens the following files:
 -time of collision, mass ratio impactor:target, tungsten anom of smaller, calculation with smaller mass 
 
 ## Analysis files
+**datagrabber.py:** Python script to search for finished output files and compile lists of surviving particles, their mass, semi-major axis, dEpsilon, ID, and Run#.
+
 **accplot.py: Python; plot variations of dEpsilon, mass, semi-major for groups of runs
 
 **accplot.m:** Matlab; plot the dEpsilon_W (tungsten isotope anomaly) and mass vs. time for chosen particle
