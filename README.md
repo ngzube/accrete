@@ -5,14 +5,14 @@
 PROJECT FLOW:
 
 ## Master run file
-**run:** CSH script that runs the following:
-- mkinput.py
+**run1:** CSH script that can run the following:
 - convert.py
+- mkinput.py
 - accrete5e_for_nick.f
 - script that stores input and output data files in a time-labeled folder
 
 ## Input files   <===
-**output.dat:** list of initial conditions and collisions of objects. Read by main program.
+**output.dat:** list of initial conditions and collisions of objects. Read by main program. O'Brien format.
 
 - Particle # - iprovenance - semi-major? - mass - y partition fraction - eccentricity - time till ejection
 - stored in arrays: NDUM,IPROV,AN,XM,YPART,ECC,TEJ
@@ -31,6 +31,7 @@ PROJECT FLOW:
 mixing factors, level of re-equilibration, and individual particle tracking.
 - Reports time-evolving stats on individual particle and final stats on
 surviving particles.
+-Adjusting the PRNT2 variable allows for screen output or output to a text file.
 
 Opens the following files:
 
@@ -40,6 +41,7 @@ Opens the following files:
 
 - *Write:*
 - Unit 28 = end.dat
+- Unit 29 = screen_output.dat (optional)
 - Unit 40 = follow.dat
 - Unit 42 = eps.dat
 - Unit 43 = followgmt.dat

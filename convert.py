@@ -11,38 +11,30 @@
 # We obtain these only for the final planets.
 ##############################################################################
 
-# Assign strings for ratio number (4 or 8) and run number to be converted:
-ratio = '8'
-run = '18'
-
 # Assign default values for those not included in Jacobson files
 iprov0 = '1'
 ypart0 = '0.3'
 ecc0 = '0'
 tej0 = '10E+11'
 
-
 #=============================================
 # Prints collected data to a text file.
 
 def publish():
-    #outfile = open('output.dat',"w")
-    # Use line below to give specific names to output files
-    outfile = open('output' + ratio + '-' + run + '.dat',"w")
-    outfile.write(str(n_objects) + '\n')
-    for i in range(len(an)):
-        #Original: NDUM,IPROV,AN,              XM,                          YPART,ECC,TEJ
-        #Jacobson: NDUM, -,   Semi-major axis, mass from first collision,   -,    -,  -
-        outfile.write(
-             str(i+1) + ' ' + iprov[i] + '  ' + an[i] + '  ' + xm[i] + '  ' + 
-             ypart[i] + '  ' + ecc[i] + '  ' + tej[i] + '\n')
-    for j in range(len(tcol)):
-        #Original: TCOL,ICT1,XMT1,ICT2,XMT2,AN,        ECC
-        #Jacobson: TCOL,ICT1,XMT1,ICT2,XMT2,Impact_Vel,Impact_Angle
-        outfile.write(
-             str(j+1) + ' ' + tcol[j] + ' ' + ict1[j] + '  ' + xmt1[j] + 
-             '  ' + ict2[j] + '  ' + xmt2[j] + '  ' + an_col[j] + '  ' + 
-             ecc_col[j] + '\n')
+    with open('output' + ratio + '-' + run + '.dat',"w") as outfile:
+        outfile.write(str(n_objects) + '\n')
+        for i in range(len(an)):
+            #Original: NDUM,IPROV,AN,       XM,                  YPART,ECC,TEJ
+            #Jacobson: NDUM, -,   Semi-maj, mass from 1st collis, -,    -,  -
+            outfile.write(' '.join([
+                str(i+1), iprov[i], an[i], xm[i], ypart[i], ecc[i], tej[i], 
+                '\n']))
+        for j in range(len(tcol)):
+            #Original: TCOL,ICT1,XMT1,ICT2,XMT2,AN,        ECC
+            #Jacobson: TCOL,ICT1,XMT1,ICT2,XMT2,Impact_Vel,Impact_Angle
+            outfile.write(' '.join([
+                 str(j+1), tcol[j], ict1[j], xmt1[j], ict2[j], xmt2[j], 
+                 an_col[j], ecc_col[j], '\n']))
     outfile.close()
 
 
@@ -91,14 +83,13 @@ def intake(ratio_string,run_string):
     return num_col, num_objects
         
 #==================================
-#MAIN SCRIPT
-
+#MAIN SCRIPT:
 # Arrays for the variables we will want to print in the style of 'output.dat'
 
 ## Code to run over all Jacobson files ##
 ratio = '4'
-numstrs = ['1','2','3','4','5','6','7','8','9','10']
-for run in numstrs:
+runnums = (str(x+1) for x in range(10))
+for run in runnums:
     # Assigns 6 separate empty lists [] to each named variable
     iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
     tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
@@ -108,9 +99,10 @@ for run in numstrs:
     if len(run) < 2: run = '0'+run
     publish()
     #print 'Finished', ratio, 'to1-0.8-Run', run
+
 ratio = '8'
-numstrs += ['11','12','13','14','15','17','18']
-for run in numstrs:
+runnums = (str(x+1) for x in range(18))
+for run in runnums:
     iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
     tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
     n_objects = 0
@@ -120,8 +112,9 @@ for run in numstrs:
     publish()
     #print 'Finished', ratio, 'to1-0.8-Run', run
 
-
 ## Code to run on a single file ##
+#ratio = '8'
+#run = '18'
 #iprov, an, xm, ypart, ecc, tej = ([] for i in range(6))
 #tcol, ict1, xmt1, ict2, xmt2, an_col, ecc_col = ([] for i in range(7))
 #n_objects = 0
@@ -129,4 +122,3 @@ for run in numstrs:
 #[num_col,num_objects] = intake(ratio,run)
 #publish()
 #print 'Finished', ratio, 'to1-0.8-Run', run
-

@@ -3,6 +3,7 @@
 
 # Use string 'dat' to create a timestamped folder, identifying the run
 set dat = `date +"%Y-%m-%d_%T"`
+set dat1 = `date +"%s"`
 echo "Run began at $dat"
 set ful = "run_$dat"
 mkdir data/$ful
@@ -22,7 +23,6 @@ mv a.out accrete5e_for_nick
 echo 'Program compiled'
 
 # Run program over all data sets
-
 set i = 1
 set r = 1
 set ratio = 4
@@ -56,18 +56,27 @@ foreach file (Jac_output/*.dat)
     endif
 end
 
-
 echo 'Final data files stored in' data/$ful
 
 # Create graphical outputs
 
+#python datagrab.py
+#mv mass_semi* data/$ful
+
+set datend = `date +"%Y-%m-%d_%T"`
+set dat2 = `date +"%s"`
+echo "Run ended at $datend"
+echo "Runtime: `expr $dat2 - $dat1` s"
 
 
 
 
-###DEPRICATED###
+###DEPRICATED### (Left behind to learn a lesson)
+#
 # Originally I let this script pull variables from the input file to identify
 # the runs, but now I just include the input file for complete identification.
+#
+################
 #
 # Set string with value for ifol, the followed particle's number:
 #set num = `cut -d ',' -f10 -s accrete4.inp | cut -d '=' -f2`
@@ -85,4 +94,3 @@ echo 'Final data files stored in' data/$ful
 # python mkinput.py
 #endif
 ################
-

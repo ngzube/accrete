@@ -41,6 +41,12 @@ C
      C        DT,XMIX,YPMX,TCORE,IDUM,IXMIX,ILOG,IWRIT,NPROV,
      C        TSTOP,XRATC,TSCALE,IRAY,IFOL,XMFIN,FINFAC,IDSC,FF
 
+C       NICK.1: Add a way to output screen data to file if needed
+        INTEGER PRNT2
+        PRNT2 = 29
+C        PRNT2 = 6
+        IF(PRNT2.EQ.29) OPEN(UNIT=29,FILE='screen_output.dat')        
+
 C       GEOCHEM. CONSTANTS. DHF AND DW ARE THE PARTITION COEFFTS
 C       (MANTLE/CORE) AND MAY BE RELATED TO FRACTIONATION FACTORS
 C       AS FOLLOWS
@@ -147,7 +153,7 @@ C       READ IN FILE FOR CONTROL PARAMETERS
 
         OPEN(UNIT=20,FILE='accrete4.inp')
         READ(20,INP)
-        WRITE(6,INP)
+        WRITE(PRNT2,INP)
 C
 C       OUTPUT FILES
 
@@ -161,7 +167,7 @@ C       SET UP INITIAL SILICATE MASS FRACTION
 
         DO I=1,NPROV
          IF(Y(I).EQ.0.)Y(I)=Y0
-         WRITE(6,*) I,' Y = ',Y(I)
+         WRITE(PRNT2,*) I,' Y = ',Y(I)
         END DO
 C
 C       READ IN COLLISION DATA FILE. NOTE THAT O'BRIEN DOES
@@ -172,7 +178,7 @@ C       COLLISION FILE ALSO INCLUDES INITIAL POSITIONS OF PARTICLES.
         J=1
         IF(IRAY.NE.2)READ(22,*) IMAX
         IF(IRAY.EQ.2)IMAX=5000
-        WRITE(6,*) 'NO OF PARTICLES ',IMAX
+        WRITE(PRNT2,*) 'NO OF PARTICLES ',IMAX
 C
 C       INITIALIZE
 
@@ -190,7 +196,7 @@ C       FE FRACTION OF INDIVIDUAL PARTICLES
 
         YPSUM=0.
         IF(NPROV.GT.1)THEN
-          WRITE(6,*) 'PROVENANCE'
+          WRITE(PRNT2,*) 'PROVENANCE'
           DO N=1,IMAX
             IF(IRAY.NE.1)READ(22,*) NDUM,IPROV(N),AN(N),XMASS
             IF(IRAY.EQ.1)READ(22,*) NDUM,IPROV(N),AN(N),
@@ -203,7 +209,7 @@ CFN
             IF(IRAY.EQ.1)YPART(N)=1.-YTP
             IF(IRAY.NE.1)YPART(N)=Y(IPROV(N))
             YPSUM=YPSUM+YPART(N)
-            IF(IRAY.NE.2)WRITE(6,*) N,IPROV(N),AN(N),
+            IF(IRAY.NE.2)WRITE(PRNT2,*) N,IPROV(N),AN(N),
      C                                   XM(N),YPART(N),TEJ(N)
 C
 C           WE CAN KEEP TRACK OF THE MIXING OF SOME ARBITRARY
@@ -257,12 +263,12 @@ C         NEXT LINES AVOID ERROR OF OVERWRITING MASS FOR IRAY.NE.2
             IF(XM(I2).EQ.0.)XM(I2)=XMT2
             IF(I1.GT.IMAX)IMAX=I1
             IF(I2.GT.IMAX)IMAX=I2
-C            write(6,*) TCOL(J),ICT1,XMT1,ICT2,XMT2,i1,i2,iray
+C            write(PRNT2,*) TCOL(J),ICT1,XMT1,ICT2,XMT2,i1,i2,iray
           ENDIF
 C
 C         AVOIDING ZERO-MASS COLLISIONS
 
-          WRITE(6,*) J,TCOL(J),I1,I2,XM(I1),XM(I2)
+          WRITE(PRNT2,*) J,TCOL(J),I1,I2,XM(I1),XM(I2)
 
           IF(XMT2.GT.0.)J=J+1
         END DO
@@ -271,13 +277,13 @@ C         AVOIDING ZERO-MASS COLLISIONS
 C
 C       IMAX IS TOTAL NUMBER OF PARTICLES
         
-        WRITE(6,*) 'IMAX = ',IMAX
+        WRITE(PRNT2,*) 'IMAX = ',IMAX
         itmp=0
         DO I=1,IMAX
           XMO(I)=XM(I)
           if(xmo(i).gt.0.)then
             itmp=itmp+1
-            write(6,*) i,itmp,xmo(i)
+            write(PRNT2,*) i,itmp,xmo(i)
           endif
         END DO
 C
@@ -296,9 +302,9 @@ C       HOW MANY PARTICLES ARE THERE?
         NPART=0
         DO I=1,IMAX
           IF(NPAR(I).GE.1)NPART=NPART+1
-c          IF(NPAR(I).GE.1)WRITE(6,*) NPART,I
+c          IF(NPAR(I).GE.1)WRITE(PRNT2,*) NPART,I
         END DO
-        WRITE(6,*) 'NPART = ',NPART
+        WRITE(PRNT2,*) 'NPART = ',NPART
 C
 C       SIMPLE THEORETICAL CALCULATION - TWO PARTICLES COLLIDING
 
@@ -312,17 +318,17 @@ C       SET UP TIME STEP, TYPICALLY 1/10 OF TIME BETWEEN COLLISIONS
         DTCOL(1)=TCOL(1)/10.
         DO J=2,JMAX
          DTCOL(J)=(TCOL(J)-TCOL(J-1))/10.
-c         write(6,*) j,dtcol(j)
+c         write(PRNT2,*) j,dtcol(j)
         END DO
         DTCOL(J+1)=DT0
-        WRITE(6,*) 'DTCOL ',J,DTCOL(J+1),DT0
+        WRITE(PRNT2,*) 'DTCOL ',J,DTCOL(J+1),DT0
 C
 C       INITIALIZE ISOTOPIC SIGNATURES
 
         DO N=1,NPROV
           DO I=1,IMAX
             IF(IPROV(I).EQ.N)THEN
-c              write(6,*) i,' nprov = ',n
+c              write(PRNT2,*) i,' nprov = ',n
               BB(I,1)=BI(1,N)
               IF(BI(1,N).EQ.0.)BB(I,1)=BI(1,1)
               BB(I,2)=BI(2,N)
@@ -362,7 +368,7 @@ C
           F1(N)=(DHF-DW)*(1.-Y(N))/
      C                          (DW*((Y(N)*DHF)+1.-Y(N)))
           F2(N)=Y(N)*(DW-DHF)/(1.+(Y(N)*(DHF-1.)))
-          WRITE(6,*) 'FRACTIONATION FACTORS ',F1(N),F2(N)
+          WRITE(PRNT2,*) 'FRACTIONATION FACTORS ',F1(N),F2(N)
           YM(N)=1.-Y(N)
         END DO
 C
@@ -373,7 +379,7 @@ C
 C       TIMESCALE IN YRS
 
         XLHF=-LOG(0.5)/THALF
-        WRITE(6,*) 'XLHF = ',XLHF
+        WRITE(PRNT2,*) 'XLHF = ',XLHF
         J=1
 
 C
@@ -396,7 +402,7 @@ C          LARGE SINCE EARLY COLLISIONS ARE MEASURED BY DTCOL
            IF(K.GT.1)TIM(K)=TIM(K-1)+DT
            IF(TIM(K).GT.TSTOP)GOTO 101
            IF(IWRIT.EQ.1.OR.MOD(K,KSTEP).EQ.0)
-     C            WRITE(6,*) K,TIM(K),J,TCOL(J),DTCOL(J)
+     C            WRITE(PRNT2,*) K,TIM(K),J,TCOL(J),DTCOL(J)
 C
 C          CHECK FOR WHETHER COLLISION OCCURS THIS TIMESTEP
 
@@ -414,13 +420,13 @@ C          ICOL KEEPS TRACK OF WHICH PARTICLE EXPERIENCES A COLLISION
 
               ICT1=IC1(J)
               ICT2=IC2(J)
-              write(6,*) 'collide ',tcol(j),ic1(j),ic2(j),ifol
+              write(PRNT2,*) 'collide ',tcol(j),ic1(j),ic2(j),ifol
 
 C
 C             DOES THE COLLISION AFFECT THE PARTICLE WE ARE FOLLOWING?
 
               IF(ICT1.EQ.IFOL.OR.ICT2.EQ.IFOL)THEN
-                 write(6,*) 'collision ',j,k,ic1(j),ic2(j),
+                 write(PRNT2,*) 'collision ',j,k,ic1(j),ic2(j),
      C                        tcol(j),tim(k),xm(ic1(j)),xm(ic2(j))
                  IFOL=ICT2
                  IF(XM(ICT1).GE.XM(ICT2))IFOL=ICT1
@@ -477,7 +483,7 @@ C&                                0.3*(3.+LOG10(XMMT))
                  WRITE(43,*) TCOL(J),GAMT,EPSTT,
      C                                0.3*(3.+LOG10(XMMT))
 
-                 write(6,*) TCOL(J),ICT1,XM(ICT1),ICT2,
+                 write(PRNT2,*) TCOL(J),ICT1,XM(ICT1),ICT2,
      C                        XM(ICT2),XM(ICT1)+XM(ICT2)
 c                 stop
                ENDIF
@@ -498,7 +504,7 @@ C           OCCURS AT A PARTICULAR TIME
 
             IF(TCORE.NE.0.AND.TIM(K).LE.TCORE
      C                         .AND.(TIM(K)+DT).GT.TCORE) THEN                  
-              WRITE(6,*) '******* CORE FORMATION *******'
+              WRITE(PRNT2,*) '******* CORE FORMATION *******'
 C
 C             MODIFIED TO AVOID THIS STEP FOR
 C             BODIES WHICH HAVE ALREADY DIFFERENTIATED
@@ -514,8 +520,8 @@ C                COLLIDE WITH ITSELF
 
                  IF(XM(I).GT.0.AND.B1(1).EQ.BC(1))THEN
                     CALL MIX(B1,B1,XM(I),XM(I),
-     C       YPART(I),YPART(I),YMIX,FF,IPROV(I),IPROV(I),2)
-                     WRITE(6,*) 'PARTICLE ',I,' UNDIFF AT ',TCORE
+     C       YPART(I),YPART(I),YMIX,FF,IPROV(I),IPROV(I),2,PRNT2)
+                     WRITE(PRNT2,*) 'PARTICLE ',I,' UNDIFF AT ',TCORE
                  ENDIF
                  DO IB=1,8
                     BB(I,IB)=B1(IB)
@@ -565,13 +571,13 @@ C                A COLLISION DOES OCCUR BETWEEN I1 AND I2 . . .
                    B1(IB)=BB(I1,IB)
                    B2(IB)=BB(I2,IB)
                  END DO
-                 WRITE(6,*) 'COLLIDE ',I1,I2,XM(I1),XM(I2),
+                 WRITE(PRNT2,*) 'COLLIDE ',I1,I2,XM(I1),XM(I2),
      C                            XM(I1)+XM(I2),J,K,TIM(K),IDSC 
  
                  EPST1=((B1(2)*BC(4)/(B1(4)*BC(2)))-1.)*1.E4
                  EPST2=((B2(2)*BC(4)/(B2(4)*BC(2)))-1.)*1.E4
-                 WRITE(6,*) 'INITIAL EPSILONS ',EPST1,EPST2
-                 write(6,*) b1(2),b2(2),bc(4),b1(4),b2(4),bc(2)
+                 WRITE(PRNT2,*) 'INITIAL EPSILONS ',EPST1,EPST2
+                 write(PRNT2,*) b1(2),b2(2),bc(4),b1(4),b2(4),bc(2)
 C
 C                UPDATE THE GEOCHEMISTRY - EFFECT OF IMPACT
 C                WILL DEPEND ON SIZE OF IMPACTOR. DIFFERENT MIXING
@@ -619,9 +625,9 @@ C                 CAN ONLY DO RE-EQUILIBRATION FOR LARGE IMPACTS)
                   IF(IXMIX.EQ.4.AND.IBIG.EQ.0)IMIX=-1
                   IF(IXMIX.EQ.4.AND.IBIG.EQ.1)IMIX=1
 
-                  WRITE(6,*) 'INITIAL STABLES ',B1(3)
+                  WRITE(PRNT2,*) 'INITIAL STABLES ',B1(3)
      C     ,B1(4),B1(3)/B1(4),B2(3),B2(4),B2(3)/B2(4)
-                  IF(IBIG.EQ.1)WRITE(6,*) 
+                  IF(IBIG.EQ.1)WRITE(PRNT2,*) 
      C             '*** BIG IMPACT ***'   
 C
 C                DISCRETIZATION TO ALLOW TOGGLING BETWEEN
@@ -646,16 +652,16 @@ C                THAN THE 'BATCH' END-MEMBER
 
                  DO II=1,IDSC
                    CALL MIX(B1,B2,XM1T,XM2T,YPART(I1),
-     C               YPART(I2),YMIX,FF,IPROV(I1),IPROV(I2),IMIX)
+     C               YPART(I2),YMIX,FF,IPROV(I1),IPROV(I2),IMIX,PRNT2)
 C
 C                  ISOTOPIC DECAY CONTINUES TO HAPPEN
 
                    CALL DECAY(B1,DTT)
-c                   write(6,*) idsc,ii,xm1t,xm2t,b1(1)
+c                   write(PRNT2,*) idsc,ii,xm1t,xm2t,b1(1)
                  END DO
 
 
-                  WRITE(6,*) 'FINAL STABLES '
+                  WRITE(PRNT2,*) 'FINAL STABLES '
      C             ,B1(3),B1(4),B1(3)/B1(4)
 C
 C                 UPDATE PARTICLE MASS CONCENTRATIONS
@@ -698,7 +704,7 @@ C                   RECORD WHERE DESTROYED PARTICLE(S) END UP
 
                     NFIN(I2)=I1
                     CALL REPLACE(XMO,NFIN,IMAX,I2,I1)
-                    WRITE(6,*) 'FINAL EPSILONS ',EPS(I1),
+                    WRITE(PRNT2,*) 'FINAL EPSILONS ',EPS(I1),
      C                                    EPS(I2),NPART
                   ELSE
 C
@@ -719,9 +725,9 @@ C                   DAVE OBRIEN CONVENTION DIFFERENT
                     EPS(IOB1)=
      C                     ((B1(2)*BC(4)/(B1(4)*BC(2)))-1.)*1.E4
                     EPS(IOB2)=0. 
-                    WRITE(6,*) 'FINAL EPSILONS ',EPS(IOB1),
+                    WRITE(PRNT2,*) 'FINAL EPSILONS ',EPS(IOB1),
      C                      EPS(IOB2),NPART
-                    write(6,*) b1(2),b1(4),bc(2),bc(4)
+                    write(PRNT2,*) b1(2),b1(4),bc(2),bc(4)
 C
 C                   RECORD WHERE DESTROYED PARTICLE ENDS UP
 
@@ -768,13 +774,13 @@ C
 C               IF PARTICLE IS EJECTED FROM THE SYSTEM THEN
 C               WE ALSO STOP PLOTTING IT
 C
-c                write(6,*) k,i,tim(k),tim(k-1),tej(i)
+c                write(PRNT2,*) k,i,tim(k),tim(k-1),tej(i)
                 IF(K.GT.1.AND.IRAY.EQ.1.AND.TIM(K).GT.TEJ(I)
      C                           .AND.TIM(K-1).LE.TEJ(I))THEN
                   XM(I)=0.
                   AN(I)=1000.
                   IEJT=IEJT+1
-                  WRITE(6,*) '****EJECTED**** ',I,TEJ(I),IEJT
+                  WRITE(PRNT2,*) '****EJECTED**** ',I,TEJ(I),IEJT
                 ENDIF
 
               END DO
@@ -816,7 +822,7 @@ C           CHECK THAT MASS BALANCE IS MAINTAINED
               SUM(JJ)=0.
             END DO
             DO I=1,IMAX
-C             WRITE(6,*) I,XM(I)
+C             WRITE(PRNT2,*) I,XM(I)
              XMT(I)=XM(I)
              XMS=XMS+XM(I)
              YT=Y(IPROV(I))
@@ -827,9 +833,9 @@ C             WRITE(6,*) I,XM(I)
              END DO
             END DO
             IF(IWRIT.EQ.1)THEN 
-              WRITE(6,*) 'ITOT = ',ITOT,' SUM = ',XMS
-              WRITE(6,*) 'CHEM SUMS ',SUM(1)+SUM(2),SUM(3),SUM(4)
-              WRITE(6,*)
+              WRITE(PRNT2,*) 'ITOT = ',ITOT,' SUM = ',XMS
+              WRITE(PRNT2,*) 'CHEM SUMS ',SUM(1)+SUM(2),SUM(3),SUM(4)
+              WRITE(PRNT2,*)
             ENDIF
 C
 C         NEXT TIMESTEP
@@ -838,26 +844,26 @@ C
 101       CONTINUE
 
        KMAX=K-1
-       WRITE(6,*) 'KMAX = ',KMAX,TIM(KMAX)
-       WRITE(6,*) 'TOTAL NUMBER EJECTED ',IEJT
+       WRITE(PRNT2,*) 'KMAX = ',KMAX,TIM(KMAX)
+       WRITE(PRNT2,*) 'TOTAL NUMBER EJECTED ',IEJT
 c       stop
 C
 C      WRITE OUT FINAL MASSES 
 
-       WRITE(6,*) 'FINAL MASSES'
-       WRITE(6,*)  'i, mass, y, semi-major axis, N col:'
+       WRITE(PRNT2,*) 'FINAL MASSES'
+       WRITE(PRNT2,*)  'i, mass, y, semi-major axis, N col:'
        XMTOT=0.
        DO I=1,IMAX
-        IF(XM(I).NE.0)WRITE(6,*) I,XM(I),YPART(I),AN(I),NCOL(I)
+        IF(XM(I).NE.0)WRITE(PRNT2,*) I,XM(I),YPART(I),AN(I),NCOL(I)
         IF(I.GT.1.OR.IRAY.EQ.1)XMTOT=XMTOT+XM(I)
        END DO
-       WRITE(6,*) 'TOTAL SURVIVING MASS: ',XMTOT,KMAX
-       WRITE(6,*) 
-       WRITE(6,*) 'TRACKING PARTICLE ',IFOL,XM(IFOL),AN(IFOL)
-       WRITE(6,*) 'MASS EXCEEDS ',FINFAC,' AT ',TFIN/1.E6,' MYR'
-       WRITE(6,*) 'MEAN INITIAL SILICATE MASS FRACTION ',YPSUM
+       WRITE(PRNT2,*) 'TOTAL SURVIVING MASS: ',XMTOT,KMAX
+       WRITE(PRNT2,*) 
+       WRITE(PRNT2,*) 'TRACKING PARTICLE ',IFOL,XM(IFOL),AN(IFOL)
+       WRITE(PRNT2,*) 'MASS EXCEEDS ',FINFAC,' AT ',TFIN/1.E6,' MYR'
+       WRITE(PRNT2,*) 'MEAN INITIAL SILICATE MASS FRACTION ',YPSUM
        DO I=1,ICFOL
-c        WRITE(6,*) I,IPART(I),TFCOL(I)
+c        WRITE(PRNT2,*) I,IPART(I),TFCOL(I)
        END DO
 C
 C
@@ -913,7 +919,7 @@ C      DECIMATE
          IF(K.EQ.1.OR.XMP(K).NE.XMP(K-1).OR.MOD(K,10).EQ.0)THEN
            TIMP(J)=TIM(K)
            XMPP(J)=XMP(K)
-c           WRITE(6,*) J,TIMP(J),XMPP(J)
+c           WRITE(PRNT2,*) J,TIMP(J),XMPP(J)
            J=J+1
          ENDIF
        END DO
@@ -942,7 +948,7 @@ CP&           XTICK,YTICK,XSIZE,YSIZE,0,-1)
 
 CP       CALL PICCLE
  
-       WRITE(6,*) 'PLOTTING GEOCHEM'
+       WRITE(PRNT2,*) 'PLOTTING GEOCHEM'
        YMN=-1.
        YTICK=1.
        ISTART=1
@@ -954,7 +960,7 @@ C
          IF(K.EQ.1.OR.XMP(K).NE.XMP(K-1).OR.MOD(K,10).EQ.0)THEN
            TIMP(J)=TIM(K)
            XMPP(J)=EPSP(K)
-C           WRITE(6,*) J,TIMP(J),XMPP(J)
+C           WRITE(PRNT2,*) J,TIMP(J),XMPP(J)
            J=J+1
          ENDIF
        END DO
@@ -1012,7 +1018,7 @@ C
 C      WRITE OUT FINAL CHARACTERISTICS OF ALL SURVIVING PARTICLES
 
        OPEN(UNIT=28,FILE='end.dat')
-       WRITE(6,*) 'j, i, N col, mass, eps, semi-major axis, Hf/W, y'
+       WRITE(PRNT2,*) 'j, i, N col, mass, eps, semi-major axis, Hf/W, y'
        DO I=1,IMAX
          IF(XM(I).GT.0.AND.NCOL(I).GT.1) THEN
 C
@@ -1028,11 +1034,12 @@ C          ONLY WRITE OUT THOSE OBJECTS WHICH SUFFERED COLLISIONS
            YP6(J)=ECC(I)
            YP7(J)=STRAC(I)
 
-           WRITE(6,*) J,I,NCOL(I),XM(I),EPS(I),AN(I),
+           WRITE(PRNT2,*) J,I,NCOL(I),XM(I),EPS(I),AN(I),
      C                                          HFW(I),YPART(I)
 C&                                         STRAC(I),YPART(I)
-C           WRITE(6,*) 'STABLE HF W ',BB(I,3),BB(I,4)
-           WRITE(28,*) XM(I),EPS(I),AN(I),
+C           WRITE(PRNT2,*) 'STABLE HF W ',BB(I,3),BB(I,4)
+C           Nick.2 Added I to the WRITE to have ID
+           WRITE(28,*) I,XM(I),EPS(I),AN(I),
      C                              YPART(I),HFW(I),ECC(I)
 C           IF(XM(I).GT.XMX)XMX=XM(I)
          ENDIF
@@ -1049,8 +1056,8 @@ CP       CALL PICCLE
 C
 C      WRITE OUT LAST BIG IMPACT CHARACTERISTICS
 
-       WRITE(6,*) 'LAST BIG IMPACT ',TBFAC/1.E6,BFACT
-       WRITE(6,*) 'EPSILONS ',BEPSW1,BEPSW2,BEPSW3              
+       WRITE(PRNT2,*) 'LAST BIG IMPACT ',TBFAC/1.E6,BFACT
+       WRITE(PRNT2,*) 'EPSILONS ',BEPSW1,BEPSW2,BEPSW3              
 
 CP       CALL ENGPLT
 
@@ -1082,15 +1089,16 @@ CP&             XSIZE,YSIZE,ISTART,1)
        RETURN
        END
 C
-C*******************************************************************************
+C*****************************************************************************
 
        SUBROUTINE MIX(B1,B2,XM1,XM2,Y1,Y2,YMIX,FF,
-     C                                   N1,N2,IMIX)
+     C                                   N1,N2,IMIX,PRNT2)
 
 C
        COMMON/PARAM/DHF,DW,XLHF
 
        REAL B1(8),B2(8),B(8),CK(8)
+       INTEGER PRNT2
 C
 C      B1 AND B2 ARE ARRAYS CONTAINING CONCENTRATIONS OF
 C      ELEMENTS:
@@ -1130,7 +1138,7 @@ C      Y IS SILICATE MASS FRACTION
        YM2=1.-Y2
        YMIX=((Y1*XM1)+(Y2*XM2))/(XM1+XM2)
 
-       write(6,*) 'mix ',imix,ym1,ym2,xm2/xm1,ff,dhf,dw
+       write(PRNT2,*) 'mix ',imix,ym1,ym2,xm2/xm1,ff,dhf,dw
 C
 C      CHECK INITIAL/FINAL MASS BALANCE
 
@@ -1182,7 +1190,7 @@ C          HF/W IN CORE
           END DO
 
        ELSEIF(IMIX.EQ.1) THEN
-c         write(6,*) 'imix=1 ',xm1,xm2,y1,y2
+c         write(PRNT2,*) 'imix=1 ',xm1,xm2,y1,y2
          IF(XM2.LE.XM1)THEN
            YM2=1.-Y2
            YM1=1.-Y1
@@ -1191,7 +1199,7 @@ C          SECTION ADDED FN JULY 05
 C          DIFFERENTIATES LARGER OBJECT IF IT IS NOT ALREADY
 
            IF(B1(1).EQ.B1(5))THEN
-c            WRITE(6,*) 'LARGER OBJECT UNDIFF '
+c            WRITE(PRNT2,*) 'LARGER OBJECT UNDIFF '
             DO I=1,3,2
 C
 C            HF/W IN MANTLEC
@@ -1213,7 +1221,7 @@ C
 C          DO SAME FOR SMALLER OBJECT
 
            IF(B2(1).EQ.B2(5))THEN
-c            WRITE(6,*) 'SMALLER OBJECT UNDIFF '
+c            WRITE(PRNT2,*) 'SMALLER OBJECT UNDIFF '
             DO I=1,3,2
 C
 C            HF/W IN MANTLE
@@ -1239,7 +1247,7 @@ C          AND ARE THEN SEPARATED TO CORE. I INTERPRET THIS
 C          TO MEAN THAT PARTITION HAPPENS AT THIS STAGE,
 C          AND THE METAL THEN ACCRETES TO THE CORE
 C
-          write(6,*) '**** ',b1(2),b1(4),b2(2),b2(6),
+          write(PRNT2,*) '**** ',b1(2),b1(4),b2(2),b2(6),
      C                                        b2(4),b2(8)
           DO I=1,4
            B(I)=((Y1*B1(I)*XM1)+(Y2*B2(I)*XM2)+
@@ -1256,10 +1264,10 @@ cfn
      C                 ((Y1*XM1)+(Y2*XM2)+(YM2*XM2*(1.-FF)))
           do i=1,4
             t1=((b(i))*((y1*xm1)+xm2))+(b1(i+4)*ym1*xm1)
-c            write(6,*) 'check ',t1/ck(i)
+c            write(PRNT2,*) 'check ',t1/ck(i)
           end do
 
-          write(6,*) '**** ',b(2),b(4),yt
+          write(PRNT2,*) '**** ',b(2),b(4),yt
 C
 C         NOW CARRY OUT PARTITIONING
 
@@ -1272,7 +1280,7 @@ C
            B1(I+1)=B(I+1)/(((1.-YT)/DW)+YT)
           END DO
 
-          write(6,*) '**** ',b1(2),b1(4),1./(((1.-YT)/DW)+YT)
+          write(PRNT2,*) '**** ',b1(2),b1(4),1./(((1.-YT)/DW)+YT)
           DO I=5,7,2
 C
 C          HF/W IN CORE OF SMALL OBJECT
@@ -1283,7 +1291,7 @@ C          HF/W IN CORE OF SMALL OBJECT
           do i=1,4
             t1=(b1(i)*((y1*xm1)+(y2*xm2)))+(b1(i+4)*ym1*xm1)+
      C                  (b(i+4)*ym2*xm2)
-c            write(6,*) 'check2 ',t1/ck(i)
+c            write(PRNT2,*) 'check2 ',t1/ck(i)
           end do
 C
 C         NOW ADD TWO CORES TOGETHER. NOTE THAT CORE SIZE
@@ -1302,7 +1310,7 @@ C
            YM1=1.-Y1     
            YM2=1.-Y2
            IF(B2(1).EQ.B2(5))THEN
-c            WRITE(6,*) 'LARGER OBJECT UNDIFF '
+c            WRITE(PRNT2,*) 'LARGER OBJECT UNDIFF '
             DO I=1,3,2
 C
 C            HF/W IN MANTLE
@@ -1325,7 +1333,7 @@ C
 C          DO SAME FOR SMALLER OBJECT
 
            IF(B1(1).EQ.B1(5))THEN
-c            WRITE(6,*) 'SMALLER OBJECT UNDIFF '
+c            WRITE(PRNT2,*) 'SMALLER OBJECT UNDIFF '
             DO I=1,3,2
 C
 C            HF/W IN MANTLE
@@ -1396,7 +1404,7 @@ C
 C         SECOND OBJECT SEPARATES INTO CORE AND MANTLE
 C         (IT IT HAS NOT ALREADY DONE SO)
           IF(B2(1).EQ.B2(5))THEN
-c            WRITE(6,*) 'SECOND OBJECT UNDIFF '
+c            WRITE(PRNT2,*) 'SECOND OBJECT UNDIFF '
 C
 C           PARTITION
 
@@ -1423,7 +1431,7 @@ C
 C         CHECK TO SEE IF OTHER OBJECT ALSO UNDIFF
 
           IF(B1(1).EQ.B1(5))THEN
-c            WRITE(6,*) 'FIRST OBJECT UNDIFF ',XM1,XM2
+c            WRITE(PRNT2,*) 'FIRST OBJECT UNDIFF ',XM1,XM2
 C
 C           PARTITION
 
@@ -1460,12 +1468,12 @@ C         NOW COMBINE
           END DO
        ENDIF
 
-c       WRITE(6,*) 'CHECKING MASS BALANCE'
+c       WRITE(PRNT2,*) 'CHECKING MASS BALANCE'
        DO I=1,4
 c         CK(I+4)=(XM1*B1(I)*Y1)+(XM2*B2(I)*Y2)+(XM1*B1(I+4)*YM1)
 c&                     +(XM2*B2(I+4)*YM2)
           CK(I+4)=(XM1+XM2)*((B1(I)*YMIX)+(B1(I+4)*(1.-YMIX)))
-c         WRITE(6,*) I,CK(I+4)/CK(I)
+c         WRITE(PRNT2,*) I,CK(I+4)/CK(I)
        END DO
 
        RETURN
