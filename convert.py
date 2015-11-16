@@ -24,7 +24,7 @@ def publish():
     with open('output' + ratio + '-' + run + '.dat',"w") as outfile:
         outfile.write(str(n_objects) + '\n')
         for i in range(len(an)):
-            #Original: NDUM,IPROV,AN,       XM,                  YPART,ECC,TEJ
+            #Original: NDUM,IPROV,AN,       XM,               YPART,ECC,TEJ
             #Jacobson: NDUM, -,   Semi-maj, mass from 1st collis, -,    -,  -
             outfile.write(' '.join([
                 str(i+1), iprov[i], an[i], xm[i], ypart[i], ecc[i], tej[i], 
@@ -65,7 +65,7 @@ def intake(ratio_string,run_string):
             # one second to the time if it matches the previous one
             current_time = float(entries[0])
             if current_time == prev_time:
-                print '******************SAME TIME*****************',current_time
+                print '****************SAME TIME***************',current_time
                 current_time += 1.0
             tcol.append(str(current_time))
             prev_time = current_time

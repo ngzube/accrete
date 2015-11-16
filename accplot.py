@@ -1,4 +1,11 @@
 
+##############################################################################
+# Python 2.7.0 script to create plots from datagrabber.py output.
+#
+# Nick Zube, completed v1.0 on 2015-11-12
+#
+##############################################################################
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -32,6 +39,10 @@ def plotter3(filename, xcol = 0, ycol = 1, zcol = 2, title = '',
 #=============================================
 def plotter3Size(filename, xcol = 0, ycol = 1, zcol = 2, title = ''):
     
+    (M_Earth, S_Earth, E_Earth) = (1., 1., 1.9)
+    (M_Mars, S_Mars, E_Mars) = (0.107, 1.524, 3)
+    scalefactor = 150
+    
     with open(filename, 'r') as infile:
         x, y, z = ([] for i in range(3))
         for line in infile:
@@ -43,12 +54,23 @@ def plotter3Size(filename, xcol = 0, ycol = 1, zcol = 2, title = ''):
     if(len(x) == len(y) and len(y) == len(z) and len(z) == len(x)):
 
         #z = [100*i for i in z] # direct version
-        z = [100*i**2 for i in z] # area version
-        plt.scatter(x, y, s=z)
+        z = [scalefactor*i**(2./3) for i in z] # area version
+        plt.scatter(x, y, s=z, c='grey', marker='o')
+
+        plt.scatter(S_Earth,E_Earth,scalefactor*M_Earth**(2./3.), c='blue')
+        plt.scatter(S_Mars,E_Mars,scalefactor*M_Mars**(2./3.), c='red')
+        plt.annotate(r'$Earth',
+             xy=(S_Earth,E_Earth), xycoords='data',
+             xytext=(+10, +10), textcoords='offset points', fontsize=16,
+             arrowprops=dict(arrowstyle="->"))
+        plt.annotate(r'$Mars',
+             xy=(S_Mars,E_Mars), xycoords='data',
+             xytext=(+10, +10), textcoords='offset points', fontsize=16,
+             arrowprops=dict(arrowstyle="->"))
         #plt.axis([xmin, xmax, ymin, ymax])
         plt.rc('text', usetex=True)
         plt.title(title + 
-            r'\textit{$\epsilon_{W}\: vs. \:semi-major \:vs. \:mass$}')
+            r'\textit{$\Delta\epsilon_{W}\: vs. \:semi-major \:vs. \:mass$}')
         plt.ylabel(r"Tungsten anomaly ($\epsilon_{W}$)")
         plt.xlabel('Semi-major axis ($AU$)')
         plt.show()

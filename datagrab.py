@@ -9,13 +9,14 @@
 ##############################################################################
 
 import finder
+import groups
 import os
 import re
 
 # USER-DEFINED VARIABLES
 
 # folders to pull data from
-datadir = 'data/run_2015-11-12_18:10:30'
+datadir = 'data/run_2015-11-13_14:42:20'
 rawdir = 'ForNimmo2'
 
 # output file name
@@ -24,8 +25,25 @@ fileSuff = ('4to1', '8to1')
 runcount = (10, 18)
 
 # minimum mass to plot
-# Recommend at least 0.08, the starting size of larger planetesimals
+# Recommend about 0.08, the starting size of larger planetesimals
 massMin = 0.08
+
+# Numbers related to columns where data is stored
+# Our output files:
+id_f = 0
+mass = 1
+epsilon = 2
+semi_wrong = 3
+y = 4
+HfW = 5
+ecc_wrong = 6
+
+# Jacobson "final.dat" raw data files:
+id_i = 1
+mass_i = 2
+semi_i = 3
+ecc = 4
+inc = 5
 
 #=============================================
 # Stores the attributes of a planetesimal: mass, semi-major axis, epsilon
@@ -39,7 +57,7 @@ class planet:
         self.s = sem
 
 #=============================================
-# Prints collected data to a text file.
+# Prints collected data to a .dat file.
 def publish(suffx,runs):
     with open(filePrefix + suffx + '.dat', 'w') as outfile:
         for num, run in sorted(runs.iteritems()):
@@ -77,11 +95,11 @@ for suff, runsize in zip(fileSuff,runcount):
                     for line in infile:
                         entries = line.split()
                         #Record entries
-                        if float(entries[1]) > massMin:
-                            singlerun[entries[0]] = planet(
-                             entries[1], entries[2], '0')
-                            print 'key=',entries[0]
-                        else: print 'Didnt include ID', entries[0]
+                        if float(entries[mass]) > massMin:
+                            singlerun[entries[id_f]] = planet(
+                             entries[mass], entries[epsilon], '0')
+                            print 'key=',entries[id_f]]
+                        else: print 'Didnt include ID', entries[id_f]
             #print 'singlerun=',singlerun
             print 'Runkey=',currun
             runs[currun] = singlerun
@@ -106,13 +124,13 @@ for suff, runsize in zip(fileSuff,runcount):
             print 'Currun',currun
             for line in infile:
                 entries = line.split()
-                print 'ID', entries[1], 'Mass',entries[2],'Run', currun
+                print 'ID', entries[id_i], 'Mass',entries[mass_i],'Run', currun
                 #print runs[currun]
                 # If a specific ID is in our dictionary of that run,
-                if entries[1] in runs[currun]:
-                    runs[currun][entries[1]].addSemi(entries[3])
+                if entries[id_i] in runs[currun]:
+                    runs[currun][entries[id_i]].addSemi(entries[semi_i])
                 else:
-                    print 'NOT HERE!'
+                    print 'NOT HERE! Probably too small.'
 
     # Open a file, store data about that runtype
     publish(suff,runs)
