@@ -62,7 +62,7 @@ Opens the following files:
 -time of collision, mass ratio impactor:target, tungsten anom of smaller, calculation with smaller mass 
 
 ## Analysis files
-**datagrabber.py:** Python script to search for finished output files and compile lists of surviving particles, their mass, semi-major axis, dEpsilon, ID, and Run#.
+**datagrabber.py:** Python script to search for finished output files and compile lists of surviving particles, their mass, semi-major axis, dEpsilon, ID, and Run#.0
 
 **accplot.py:** Python; plot variations of dEpsilon, mass, semi-major for groups of runs
 
@@ -81,4 +81,37 @@ Halliday, Alexander;
 Agnor, C;
 Yin, Qingzhu;
 Jacobsen, Stein;
+
+hf/w ratio vs a
+hf/w vs eps
+
+
+
+
+Project Log
+
+2015-12-11 Fri
+Run1: ff-1., Run2: ff=0.5, Run3: ff=0., Run4, ff=0.5, idsc=100
+Adjusted accplotspecial.py to make color, dot-size scaled plots
+
+2016-01-10 Mon
+-Submitted abstract to LPSC
+
+2016-02-05 Fri
+-Abstract accepted as poster at LPSC (displaying 3/22/16 Tue 6-9PM)
+Town Center Exhibit Area, Poster #544
+
+2016-02-04 Thu
+Talked with Rebecca:
+She is calculating P,T for collisio, calculate partition coefficient
+(coeffieient varies as function of time).
+Compare results with her
+
+2016-02-09 Tue
+-Attempting to make output.dat for new Jacobson files
+-Remembering I had to manually edit duplicate collision times on old files
+-Trying to add a "makefollowlist" method to "convert.py"
+
+
+
 

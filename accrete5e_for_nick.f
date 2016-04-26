@@ -20,21 +20,24 @@ C       VERSION 5E INCORPORATES INCOMPLETE RE-EQUILIBRATION
 C
 
 
-        REAL TIM(25000),XMT(5000),XP(5000),XMO(5000)
-        REAL B1(8),B2(8),BB(5000,8),BC(4),SUM(4),YP3(5000)
-        REAL BI(8,10),F1(10),F2(10),YM(10),HFW(5000)
-        REAL EPS(5000),YP(5000),XP2(5000),YP2(5000)
-        REAL EPSTH(5000),YP4(5000),YP5(5000),ECC(5000)
-        REAL YP6(5000),TEJ(5000),STRAC(5000),YP7(5000)
+        REAL TIM(25000),XMT(8000),XP(8000),XMO(8000)
+        REAL B1(8),B2(8),BB(8000,8),BC(4),SUM(4),YP3(8000)
+        REAL BI(8,10),F1(10),F2(10),YM(10),HFW(8000)
+        REAL EPS(8000),YP(8000),XP2(8000),YP2(8000)
+        REAL EPSTH(8000),YP4(8000),YP5(8000),ECC(8000)
+        REAL YP6(8000),TEJ(8000),STRAC(8000),YP7(8000)
         REAL EPSP(25000),XMP(25000),TIMP(2500),XMPP(2500)
         REAL ABIN(50),XBIN(50),CON(50),TPL(50),FAX(50)
 
+C	      New variables for use with varying f_Hf/W
+	      REAL DWX(8000), FHFW(8000)
 
-        REAL XM(5000),TCOL(5000),DTCOL(5000),AXES(5000)
-        REAL Y(10),YPART(5000)
-        REAL AN(5000),DWW(10),TFCOL(2500)
-        INTEGER IC1(5000),IC2(5000),IPART(2500),NPAR(5000)
-        INTEGER ICOL(5000),IPROV(5000),NCOL(5000),NFIN(5000)
+
+        REAL XM(8000),TCOL(8000),DTCOL(8000),AXES(8000)
+        REAL Y(10),YPART(8000)
+        REAL AN(8000),DWW(10),TFCOL(2500)
+        INTEGER IC1(8000),IC2(8000),IPART(2500),NPAR(8000)
+        INTEGER ICOL(8000),IPROV(8000),NCOL(8000),NFIN(8000)
         COMMON/PARAM/DHF,DW,XLHF
         COMMON/WSPACE/W1(400000)
         NAMELIST/INP/DHF,DW,THALF,Y0,BI,KMAX,ITH,KSTEP,
@@ -45,7 +48,10 @@ C       NICK.1: Add a way to output screen data to file if needed
         INTEGER PRNT2
         PRNT2 = 29
 C        PRNT2 = 6
-        IF(PRNT2.EQ.29) OPEN(UNIT=29,FILE='screen_output.dat')        
+        IF(PRNT2.EQ.29) OPEN(UNIT=29,FILE='screen_output.dat')  
+
+C	      NICK.2 FHFW=13.+(12.*(2./PI)*ATAN((1.3-A)/ALF)) ALF=0.3
+C	      Formula for f_Hf/W found in Nimmo 2010 Fig 1a      
 
 C       GEOCHEM. CONSTANTS. DHF AND DW ARE THE PARTITION COEFFTS
 C       (MANTLE/CORE) AND MAY BE RELATED TO FRACTIONATION FACTORS
@@ -84,6 +90,7 @@ C
         XMFIN=0.9496
         FINFAC=0.95
         TFIN=0.
+        PI=4.*ATAN(1.)
 C
 C       TIMESTEP DT AND HALF-LIFE THALF ARE IN YRS
 C       ILOG CONTROLS PLOTTING, IWRIT CONTROLS OUTPUT
@@ -147,7 +154,7 @@ C       INDICES 5-8 WILL BE USED FOR CORE
 
         DO J=5,8
           BI(J,1)=BI(J-4,1)
-        END DO
+        END DO  
 C
 C       READ IN FILE FOR CONTROL PARAMETERS
 
@@ -202,10 +209,12 @@ C       FE FRACTION OF INDIVIDUAL PARTICLES
             IF(IRAY.EQ.1)READ(22,*) NDUM,IPROV(N),AN(N),
      C                           XMASS,YTP,ECC(N),TEJ(N)
 C            READ(22,*) NDUM,IPROV(N)
+
 CFN
 C           CORRECTING MASS-READING ERROR
 CFN
             XM(N)=XMASS
+
             IF(IRAY.EQ.1)YPART(N)=1.-YTP
             IF(IRAY.NE.1)YPART(N)=Y(IPROV(N))
             YPSUM=YPSUM+YPART(N)
@@ -214,7 +223,16 @@ CFN
 C
 C           WE CAN KEEP TRACK OF THE MIXING OF SOME ARBITRARY
 C           TRACER 
-C 
+
+C 	    NICK.2 added below to track fHf/W; used ALF = 0.3
+            FHFW(N)=13.+(12.*(2./PI)*ATAN((1.3-AN(N))/0.3))
+C	    WRITE(6,*) 'FHFW:', FHFW(N), 'A: ', AN(N)
+	    DWX(N) = FHFW(N)*Y0/(1.-Y0)
+C	    WRITE(6,*) 'DWX: ', DWX(N)
+	    DWX(N) = 1./DWX(N)
+C            WRITE(6,*) 'Real DWX: ', DWX(N)
+		
+
             STRAC(N)=0.1*EXP(-AN(N))
           END DO
         ENDIF
@@ -367,6 +385,7 @@ C
         DO N=1,NPROV
           F1(N)=(DHF-DW)*(1.-Y(N))/
      C                          (DW*((Y(N)*DHF)+1.-Y(N)))
+
           F2(N)=Y(N)*(DW-DHF)/(1.+(Y(N)*(DHF-1.)))
           WRITE(PRNT2,*) 'FRACTIONATION FACTORS ',F1(N),F2(N)
           YM(N)=1.-Y(N)
@@ -518,9 +537,11 @@ C                CORE FORMATION IS CALCULATED USING THE "MIX"
 C                SUBROUTINE WITH IMIX=2 AND HAVING EACH PARTICLE
 C                COLLIDE WITH ITSELF
 
+C		Nick.2 added DWX to passed variables
                  IF(XM(I).GT.0.AND.B1(1).EQ.BC(1))THEN
                     CALL MIX(B1,B1,XM(I),XM(I),
-     C       YPART(I),YPART(I),YMIX,FF,IPROV(I),IPROV(I),2,PRNT2)
+     C       YPART(I),YPART(I),YMIX,FF,IPROV(I),IPROV(I),2,PRNT2,
+     C	     DWX(I),DWX(I))
                      WRITE(PRNT2,*) 'PARTICLE ',I,' UNDIFF AT ',TCORE
                  ENDIF
                  DO IB=1,8
@@ -652,7 +673,8 @@ C                THAN THE 'BATCH' END-MEMBER
 
                  DO II=1,IDSC
                    CALL MIX(B1,B2,XM1T,XM2T,YPART(I1),
-     C               YPART(I2),YMIX,FF,IPROV(I1),IPROV(I2),IMIX,PRNT2)
+     C               YPART(I2),YMIX,FF,IPROV(I1),IPROV(I2),IMIX,PRNT2,
+     C		     DWX(I1),DWX(I2))
 C
 C                  ISOTOPIC DECAY CONTINUES TO HAPPEN
 
@@ -692,6 +714,7 @@ C                 RAYMOND ALSO USES THIS CONVENTION
                   IF(IRAY.NE.2)THEN
                     XM(I1)=XM(I1)+XM(I2)
                     XM(I2)=0.
+		    
                     DO IB=1,8
                        BB(I1,IB)=B1(IB)
                        BB(I2,IB)=0.
@@ -820,7 +843,7 @@ C           CHECK THAT MASS BALANCE IS MAINTAINED
             XMS=0.
             DO JJ=1,4
               SUM(JJ)=0.
-            END DO
+	    END DO
             DO I=1,IMAX
 C             WRITE(PRNT2,*) I,XM(I)
              XMT(I)=XM(I)
@@ -1092,13 +1115,14 @@ C
 C*****************************************************************************
 
        SUBROUTINE MIX(B1,B2,XM1,XM2,Y1,Y2,YMIX,FF,
-     C                                   N1,N2,IMIX,PRNT2)
+     C                                   N1,N2,IMIX,PRNT2,DW1,DW2)
 
 C
        COMMON/PARAM/DHF,DW,XLHF
 
-       REAL B1(8),B2(8),B(8),CK(8)
+       REAL B1(8),B2(8),B(8),CK(8),DW1,DW2
        INTEGER PRNT2
+
 C
 C      B1 AND B2 ARE ARRAYS CONTAINING CONCENTRATIONS OF
 C      ELEMENTS:
@@ -1138,7 +1162,7 @@ C      Y IS SILICATE MASS FRACTION
        YM2=1.-Y2
        YMIX=((Y1*XM1)+(Y2*XM2))/(XM1+XM2)
 
-       write(PRNT2,*) 'mix ',imix,ym1,ym2,xm2/xm1,ff,dhf,dw
+       write(PRNT2,*) 'mix ',imix,ym1,ym2,xm2/xm1,ff,dhf,dw1,dw2
 C
 C      CHECK INITIAL/FINAL MASS BALANCE
 
@@ -1179,14 +1203,14 @@ C
 C          HF/W IN MANTLE
 
            B1(I)=B(I)/(YT+((1.-YT)/DHF))
-           B1(I+1)=B(I+1)/(YT+((1.-YT)/DW))
+           B1(I+1)=B(I+1)/(YT+((1.-YT)/DW1))
           END DO
           DO I=5,7,2
 C
 C          HF/W IN CORE
 
            B1(I)=B(I-4)/(1+(YT*(DHF-1.)))
-           B1(I+1)=B(I-3)/(1+(YT*(DW-1.)))          
+           B1(I+1)=B(I-3)/(1+(YT*(DW1-1.)))          
           END DO
 
        ELSEIF(IMIX.EQ.1) THEN
@@ -1204,14 +1228,14 @@ c            WRITE(PRNT2,*) 'LARGER OBJECT UNDIFF '
 C
 C            HF/W IN MANTLEC
              B(I)=B1(I)/(Y1+((1.-Y1)/DHF))
-             B(I+1)=B1(I+1)/(Y1+((1.-Y1)/DW))
+             B(I+1)=B1(I+1)/(Y1+((1.-Y1)/DW1))
             END DO
             DO I=5,7,2
 C
 C            HF/W IN CORE
 
              B(I)=B1(I-4)/(1+(Y1*(DHF-1.)))
-             B(I+1)=B1(I-3)/(1+(Y1*(DW-1.)))          
+             B(I+1)=B1(I-3)/(1+(Y1*(DW1-1.)))          
             END DO
             DO I=1,8
               B1(I)=B(I)
@@ -1227,14 +1251,14 @@ C
 C            HF/W IN MANTLE
 
              B(I)=B2(I)/(Y2+((1.-Y2)/DHF))
-             B(I+1)=B2(I+1)/(Y2+((1.-Y2)/DW))
+             B(I+1)=B2(I+1)/(Y2+((1.-Y2)/DW2))
             END DO
             DO I=5,7,2
 C
 C            HF/W IN CORE
 
              B(I)=B2(I-4)/(1+(Y2*(DHF-1.)))
-             B(I+1)=B2(I-3)/(1+(Y2*(DW-1.)))          
+             B(I+1)=B2(I-3)/(1+(Y2*(DW2-1.)))          
             END DO
             DO I=1,8
               B2(I)=B(I)
@@ -1277,16 +1301,16 @@ C          HF/W IN MANTLE
 C
 
            B1(I)=B(I)/(((1.-YT)/DHF)+YT)
-           B1(I+1)=B(I+1)/(((1.-YT)/DW)+YT)
+           B1(I+1)=B(I+1)/(((1.-YT)/DW1)+YT)
           END DO
 
-          write(PRNT2,*) '**** ',b1(2),b1(4),1./(((1.-YT)/DW)+YT)
+          write(PRNT2,*) '**** ',b1(2),b1(4),1./(((1.-YT)/DW1)+YT)
           DO I=5,7,2
 C
 C          HF/W IN CORE OF SMALL OBJECT
 
            B(I)=B(I)/(1.-YT+(YT*DHF))
-           B(I+1)=B(I+1)/(1.-YT+(YT*DW))  
+           B(I+1)=B(I+1)/(1.-YT+(YT*DW1))  
           END DO
           do i=1,4
             t1=(b1(i)*((y1*xm1)+(y2*xm2)))+(b1(i+4)*ym1*xm1)+
@@ -1316,14 +1340,14 @@ C
 C            HF/W IN MANTLE
 
              B(I)=B2(I)/(Y2+((1.-Y2)/DHF))
-             B(I+1)=B2(I+1)/(Y2+((1.-Y2)/DW))
+             B(I+1)=B2(I+1)/(Y2+((1.-Y2)/DW2))
             END DO
             DO I=5,7,2
 C
 C            HF/W IN CORE
 
              B(I)=B2(I-4)/(1+(Y2*(DHF-1.)))
-             B(I+1)=B2(I-3)/(1+(Y2*(DW-1.)))          
+             B(I+1)=B2(I-3)/(1+(Y2*(DW2-1.)))          
             END DO
             DO I=1,8
               B2(I)=B(I)
@@ -1339,14 +1363,14 @@ C
 C            HF/W IN MANTLE
 
              B(I)=B1(I)/(Y1+((1.-Y1)/DHF))
-             B(I+1)=B1(I+1)/(Y1+((1.-Y1)/DW))
+             B(I+1)=B1(I+1)/(Y1+((1.-Y1)/DW1))
             END DO
             DO I=5,7,2
 C
 C            HF/W IN CORE
 
              B(I)=B1(I-4)/(1+(Y1*(DHF-1.)))
-             B(I+1)=B1(I-3)/(1+(Y1*(DW-1.)))          
+             B(I+1)=B1(I-3)/(1+(Y1*(DW1-1.)))          
             END DO
             DO I=1,8
               B1(I)=B(I)
@@ -1374,14 +1398,14 @@ C
 C           HF/W IN MANTLE
 
             B2(I)=B(I)/(((1.-YT)/DHF)+YT)
-            B2(I+1)=B(I+1)/(((1.-YT)/DW)+YT)
+            B2(I+1)=B(I+1)/(((1.-YT)/DW2)+YT)
            END DO
            DO I=5,7,2
 C
 C           HF/W IN CORE OF SMALL OBJECT
 
             B(I)=B(I)/(1.-YT+(YT*DHF))
-            B(I+1)=B(I+1)/(1.-YT+(YT*DW))      
+            B(I+1)=B(I+1)/(1.-YT+(YT*DW2))      
            END DO
 C
 C          NOW ADD TWO CORES TOGETHER
@@ -1413,14 +1437,14 @@ C
 C            HF/W IN MANTLE
 
              B(I)=B2(I)/(Y2+((1.-Y2)/DHF))
-             B(I+1)=B2(I+1)/(Y2+((1.-Y2)/DW))
+             B(I+1)=B2(I+1)/(Y2+((1.-Y2)/DW2))
             END DO
             DO I=5,7,2
 C
 C            HF/W IN CORE
 
              B(I)=B2(I-4)/(1+(Y2*(DHF-1.)))
-             B(I+1)=B2(I-3)/(1+(Y2*(DW-1.)))          
+             B(I+1)=B2(I-3)/(1+(Y2*(DW2-1.)))          
             END DO
           ELSE
             DO I=1,8
@@ -1440,14 +1464,14 @@ C
 C            HF/W IN MANTLE
 
              B2(I)=B1(I)/(Y1+((1.-Y1)/DHF))
-             B2(I+1)=B1(I+1)/(Y1+((1.-Y1)/DW))
+             B2(I+1)=B1(I+1)/(Y1+((1.-Y1)/DW1))
             END DO
             DO I=5,7,2
 C
 C            HF/W IN CORE
 
              B2(I)=B1(I-4)/(1.+(Y1*(DHF-1.)))
-             B2(I+1)=B1(I-3)/(1.+(Y1*(DW-1.)))          
+             B2(I+1)=B1(I-3)/(1.+(Y1*(DW1-1.)))          
             END DO
             DO I=1,8
               B1(I)=B2(I)

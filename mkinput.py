@@ -1,21 +1,25 @@
-##############################################################################
+#############################################################################
 # Python 2.7.0 script to create an input file for accrete5e.
 #
-# Nick Zube, completed v1.0 on 2015-10-09
-# Accepts input from a window and prints a txt file to be used by accrete5e
-
-# Uses:
+# Nick Zube
+# University of California - Santa Cruz, Earth & Planetary Science
+#
+# v1.0, 2015-10-09: completed
+#
+# Prints a txt file to be used by accrete5e
+#
+# Ways to call this program:
 #
 # $ python mkinput.py  
-#     -> creates accrete4.inp from default values below
+#    -> creates accrete4.inp from default values below
 #
 # $ python mkinput.py -fol 3
-#     -> creates accrete4.inp from default values below, changing ifol to 3
+#    -> creates accrete4.inp from default values below, changing ifol to 3
 #
 # $ python mkinput.py  -c
-#     -> Allow user input with a GUI of all values, then creates accrete4e.inp
+#    -> Allow user input with a GUI of all values, then creates accrete4e.inp
 #
-##############################################################################
+#############################################################################
 
 # Tkinter is a GUI package in Python
 from Tkinter import *
@@ -41,7 +45,7 @@ variables = ['nprov','ff','tstop','iray','ilog','idsc','ixmix',
     'xmix','xratc','ifol','dw','tscale','kmax','kstep','dt',
     'ypmx']
 num_inputs = 16
-defaults = ['6','0.5','2.5e8','1','1','1','1',
+defaults = ['6','0','2.5e8','1','1','1','1',
     '100.','0.7','7','0.034','1.','200000','100','2.5e5',
     '20.']
 
@@ -51,12 +55,12 @@ defaults = ['6','0.5','2.5e8','1','1','1','1',
 #    '20.']
 
 # Typical changes to default values:
-# FF default may be 0 or 1
+# FF default may be between 0 and 1
 # IDSC default may be 1 or 100 (full plumbing or not)
 # IFOL may be any particle ID#
 
 
-# publish prints collected data to a text file. Activates on a button push.
+# publish prints collected data to a text file
 def publish():
     outfile = open('accrete4.inp',"w")
     outfile.write(' &inp\n')
@@ -86,7 +90,7 @@ if args.fol != 0:
     v[9] = str(args.fol[0])
     publish()
 elif not args.change:
-    print 'input not asked for'
+    #print 'input not asked for'
     publish()
 else:
  print 'complete input asked for'
@@ -112,4 +116,3 @@ else:
  ok.focus_force()
  # mainloop runs the frame on a loop until it is closed (upon button press)
  root.mainloop()
-
